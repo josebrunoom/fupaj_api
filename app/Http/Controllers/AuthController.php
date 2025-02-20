@@ -7,45 +7,92 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function register(Request $request) {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,user'
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255',
+                'password' => 'required|string|min:6',
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role
-        ]);
+            $usuario = $request->only('email');
 
-        $token = JWTAuth::fromUser($user);
+            // Checking duplicated information
+            $duplicated_error = $this->checkDuplicatedInformation($usuario);
 
-        return response()->json(['user' => $user, 'token' => $token]);
+            if ($duplicated_error != null) {
+                return $duplicated_error;
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),      
+            ]);
+
+            $token = JWTAuth::fromUser($user);
+
+            return response()->json(['user' => $user, 'token' => $token]);
+        }
+        catch (\Exception $e) {
+            Log::error($e);
+
+            return response()->json([
+                'exception'=>$e->getMessage(),
+                "error" => "Não foi possível criar o usuário, tente novamente mais tarde",
+            ], 500);
+        }
+    }
+
+    private function checkDuplicatedInformation($usuario)
+    {
+        if (isset($usuario['email'])) {
+
+            $email_in_use = User::where('email', $usuario['email'])->count();
+
+            if ($email_in_use) {
+                $message = '';
+
+                if($email_in_use) {
+                    $message = $message . "O email '{$usuario['email']}' já está em uso. ";
+                }
+
+                return response()->json([
+                    'title'=> 'Falha na autenticação!',
+                    'message'=>$message,
+
+                ],401);
+            }
+        }
+
+        return null;
     }
 
     public function login(Request $request) {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = Auth::attempt($credentials)) {
+        if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+        
         return response()->json(['token' => $token]);
     }
 
     public function profile() {
-        return response()->json(Auth::user());
+
+        if (!JWTAuth::user()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        return response()->json(JWTAuth::user());
     }
 
     public function logout() {
-        Auth::logout();
+        JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json(['message' => 'Logout realizado com sucesso']);
     }
 }
