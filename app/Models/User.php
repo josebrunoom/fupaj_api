@@ -14,7 +14,51 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    protected $fillable = [
+        // Campos padrão
+        'name',
+        'email',
+        'password',
+        'role',
+        // Novos campos adicionados
+        'CODIGO',
+        'SITUACAO',
+        'SEXO',
+        'NOME',
+        'ENDERECO',
+        'BAIRRO',
+        'CIDADE',
+        'ESTADO',
+        'CEP',
+        'ESTADOCIVIL',
+        'TELEFONE',
+        'CELULAR',
+        'NACIONALIDADE',
+        'IDENTIDADE',
+        'CPF',
+        'DATAADMISSAO_NU',
+        'CARTPROFISSIONAL',
+        'FUNCAO',
+        'PLANOSAUDE',
+        'PIS',
+        'DATADEMISSAO',
+        'USUARIO',
+        'DATAHORA',
+        'BANCO',
+        'AGENCIA',
+        'CONTACORRENTE',
+        'DIGITOCONTA',
+        'CONTAPOUPANCA',
+        'NASCIMENTO',
+        'EMPRESA',
+        'DATAADMISSAO',
+        'DOCTO_SUS',
+        'NOME_PAI',
+        'NOME_MAE',
+        'DATA_IDENTIDADE',
+        'ORGAO_IDENTIDADE'
+
+    ];
 
     protected $hidden = ['password'];
 
