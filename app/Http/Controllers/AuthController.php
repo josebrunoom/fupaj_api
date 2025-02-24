@@ -82,6 +82,15 @@ class AuthController extends Controller
         return response()->json(['token' => $token]);
     }
 
+    public function index() {
+
+        if (!JWTAuth::user()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        return response()->json(User::all());
+    }
+
     public function profile() {
 
         if (!JWTAuth::user()) {

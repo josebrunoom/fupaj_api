@@ -6,13 +6,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MovFarmaciaController;
+use App\Http\Controllers\FarmaciaController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth.jwt')->group(function () {
-    Route::get('/profile', [AuthController::class, 'profile']);
+
+    //USERS
+    Route::get('/users', [AuthController::class, 'index']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/profile', [AuthController::class, 'profile']);
 
     //EMPRESAS
     Route::apiResource('empresas', EmpresaController::class);
