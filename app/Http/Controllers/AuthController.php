@@ -104,5 +104,11 @@ class AuthController extends Controller
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json(['message' => 'Logout realizado com sucesso']);
     }
+
+    public function destroy($id)
+    {
+        User::destroy($id);
+        return response()->json(['message' => 'Usuario excluído com sucesso']);
+    }
 }
 

@@ -18,6 +18,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
 
+    Route::delete('/users/{id}', [AuthController::class, 'destroy']);
+
     //EMPRESAS
     Route::apiResource('empresas', EmpresaController::class);
 
