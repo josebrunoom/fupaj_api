@@ -91,6 +91,12 @@ class AuthController extends Controller
         return response()->json(User::all());
     }
 
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+
     public function profile() {
 
         if (!JWTAuth::user()) {
