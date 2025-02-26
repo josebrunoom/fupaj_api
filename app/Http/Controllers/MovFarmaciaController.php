@@ -8,7 +8,12 @@ class MovFarmaciaController extends Controller
 {
     public function index()
     {
-        return response()->json(MovFarmacia::all());
+        $mov_farmacia = MovFarmacia::join('users','users.id','=','mov_farmacia.associado')
+        ->join('farmacias','farmacias.codigo','=','mov_farmacia.farmacia')
+        ->select('mov_farmacia.*', 'users.name as nome_usuario', 'farmacias.nome as nome_farmacia')
+        ->get();
+
+        return response()->json($mov_farmacia);
     }
 
     public function store(Request $request)
@@ -33,7 +38,12 @@ class MovFarmaciaController extends Controller
 
     public function show($id)
     {
-        $mov_farmacia = MovFarmacia::findOrFail($id);
+        $mov_farmacia = MovFarmacia::join('users','users.id','=','mov_farmacia.associado')
+        ->join('farmacias','farmacias.codigo','=','mov_farmacia.farmacia')
+        ->select('mov_farmacia.*', 'users.name as nome_usuario', 'farmacias.nome as nome_farmacia')
+        ->where('mov_farmacia.id',$id)
+        ->get();
+        
         return response()->json($mov_farmacia);
     }
 
