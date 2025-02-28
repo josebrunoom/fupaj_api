@@ -16,6 +16,7 @@ Route::middleware('auth.jwt')->group(function () {
     //USERS
     Route::get('/users', [AuthController::class, 'index']);
     Route::get('/users/{id}', [AuthController::class, 'show']);
+    Route::put('/users/{id}', [AuthController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
 

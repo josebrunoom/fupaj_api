@@ -111,6 +111,13 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logout realizado com sucesso']);
     }
 
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $user->update($request->all());
+        return response()->json($user);
+    }
+
     public function destroy($id)
     {
         User::destroy($id);
