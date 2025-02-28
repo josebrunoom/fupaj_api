@@ -1,0 +1,57 @@
+function gerarInsert() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow(); // Última linha com dados
+  var lastColumn = sheet.getLastColumn(); // Última coluna usada
+  var data = sheet.getRange(2, 1, lastRow - 1, lastColumn).getValues(); // Pega os dados a partir da linha 2
+
+  // Cabeçalhos (colunas da tabela)
+  var colunas = ["CODIGO", "SITUACAO", "SEXO", "NOME", "ENDERECO", "BAIRRO", "CIDADE", "ESTADO", "CEP",
+                 "ESTADOCIVIL", "TELEFONE", "CELULAR", "NACIONALIDADE", "IDENTIDADE", "CPF", "DATAADMISSAO_NU",
+                 "CARTPROFISSIONAL", "FUNCAO", "PLANOSAUDE", "PIS", "DATADEMISSAO", "USUARIO", "DATAHORA", "BANCO",
+                 "AGENCIA", "CONTACORRENTE", "DIGITOCONTA", "CONTAPOUPANCA", "NASCIMENTO", "EMPRESA", "DATAADMISSAO",
+                 "DOCTO_SUS", "NOME_PAI", "NOME_MAE", "DATA_IDENTIDADE", "ORGAO_IDENTIDADE", "password"];
+
+  var inserts = [];
+
+  for (var i = 0; i < data.length; i++) {
+    var linha = data[i];
+
+    //formatar data corretamente
+    function formatarData(valor) {
+      if (valor instanceof Date) { 
+        var hasTime = valor.getHours() !== 0 || valor.getMinutes() !== 0 || valor.getSeconds() !== 0;
+        return hasTime 
+          ? Utilities.formatDate(valor, Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss")
+          : Utilities.formatDate(valor, Session.getScriptTimeZone(), "yyyy-MM-dd");
+      } else if (typeof valor === "string") { 
+        
+        var match = valor.match(/^(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2}):(\d{2}))?$/);
+        if (match) {
+          var year = match[3], month = match[1], day = match[2];
+          var hasTime = match[4] !== undefined;
+          return hasTime 
+            ? `${year}-${month}-${day} ${match[4]}:${match[5]}:${match[6]}`
+            : `${year}-${month}-${day}`;
+        }
+      }
+      return valor;
+    }
+
+    // Formatando as datas específicas
+    linha[15] = formatarData(linha[15]); // DATAADMISSAO_NU
+    linha[21] = formatarData(linha[21]); // DATADEMISSAO
+    linha[22] = formatarData(linha[22]); // DATAHORA
+    linha[28] = formatarData(linha[28]); // NASCIMENTO
+    linha[30] = formatarData(linha[30]); // DATAADMISSAO
+    linha[35] = formatarData(linha[35]); // DATA_IDENTIDADE
+
+    // Criando a string do INSERT
+    var valores = linha.map(valor => (valor === "" || valor === null) ? "NULL" : "'" + valor + "'").join(", ");
+    var insertSQL = `INSERT INTO users (${colunas.join(", ")}) VALUES (${valores});`;
+    
+    inserts.push([insertSQL]); // Adiciona o comando na matriz
+  }
+
+  // Inserindo os INSERTs na coluna AL (coluna 38)
+  sheet.getRange(2, 38, inserts.length, 1).setValues(inserts);
+}

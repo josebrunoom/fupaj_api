@@ -1,0 +1,56 @@
+function gerarInsertFarmacias() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow(); // Última linha com dados
+  var data = sheet.getRange(2, 1, lastRow - 1, 13).getValues(); // Pega os dados das colunas A até M
+
+  // Definição dos nomes das colunas do banco de dados
+  var colunas = ["codigo", "cnpj", "nome", "endereco", "bairro", "cidade", "uf", "cep", 
+                 "telefone", "fax", "inscricao_estadual", "usuario", "data_hora"];
+
+  var inserts = [];
+
+  for (var i = 0; i < data.length; i++) {
+    var linha = data[i];
+
+    // Função para formatar data e hora corretamente
+    function formatarDataHora(valor) {
+      if (valor instanceof Date) { 
+        return Utilities.formatDate(valor, Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss");
+      } else if (typeof valor === "string") { 
+        var match = valor.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
+        if (match) {
+          return `${match[3]}-${match[2]}-${match[1]} ${match[4]}:${match[5]}:${match[6]}`;
+        }
+      }
+      return valor;
+    }
+
+    // Formatando a data e hora da coluna M (índice 12 no array)
+    linha[12] = formatarDataHora(linha[12]);
+
+    // Função para formatar o telefone (coluna I, índice 8)
+    function formatarTelefone(telefone) {
+      if (typeof telefone === "string") {
+        telefone = telefone.replace(/\D/g, ""); // Remove tudo que não for número
+        if (telefone.length === 10) { 
+          return telefone.replace(/(\d{2})(\d{4})(\d{4})/, "$1-$2-$3");
+        } else if (telefone.length === 11) { 
+          return telefone.replace(/(\d{2})(\d{5})(\d{4})/, "$1-$2-$3");
+        }
+      }
+      return telefone;
+    }
+
+    // Aplicando a formatação ao telefone
+    linha[8] = formatarTelefone(linha[8]);
+
+    // Criando a string do INSERT
+    var valores = linha.map(valor => (valor === "" || valor === null) ? "NULL" : "'" + valor + "'").join(", ");
+    var insertSQL = `INSERT INTO farmacias (${colunas.join(", ")}) VALUES (${valores});`;
+    
+    inserts.push([insertSQL]); // Adiciona o comando na matriz
+  }
+
+  // Inserindo os INSERTs na coluna N (coluna 14)
+  sheet.getRange(2, 14, inserts.length, 1).setValues(inserts);
+}
