@@ -8,6 +8,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MovFarmaciaController;
 use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\MovFiltroSolarController;
+use App\Http\Controllers\MovChequeController;
+use App\Http\Controllers\MovChequeCrecheController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -36,6 +38,13 @@ Route::middleware('auth.jwt')->group(function () {
 
     //FILTRO SOLAR
     Route::apiResource('mov_filtrosolar', MovFiltroSolarController::class);
+
+    //MOV CHEQUES
+    Route::apiResource('mov-cheques', MovChequeController::class);
+
+    //MOV CHEQUES
+    Route::apiResource('mov-chequescreches', MovChequeCrecheController::class);
+
     
 });
 
