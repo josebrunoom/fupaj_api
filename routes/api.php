@@ -7,6 +7,7 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MovFarmaciaController;
 use App\Http\Controllers\FarmaciaController;
+use App\Http\Controllers\MovFiltroSolarController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,6 +31,12 @@ Route::middleware('auth.jwt')->group(function () {
 
     //MOV FARMACIAS
     Route::apiResource('mov_farmacia', MovFarmaciaController::class);
+
+    Route::get('/mov_farmacia/farmacia/{id}', [MovFarmaciaController::class, 'showByFarmancia']);
+
+    //FILTRO SOLAR
+    Route::apiResource('mov_filtrosolar', MovFiltroSolarController::class);
+    
 });
 
 

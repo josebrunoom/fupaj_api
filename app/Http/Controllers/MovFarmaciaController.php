@@ -47,6 +47,17 @@ class MovFarmaciaController extends Controller
         return response()->json($mov_farmacia);
     }
 
+    public function showByFarmancia($id)
+    {
+        $mov_farmacia = MovFarmacia::join('users','users.id','=','mov_farmacia.associado')
+        ->join('farmacias','farmacias.codigo','=','mov_farmacia.farmacia')
+        ->select('mov_farmacia.*', 'users.name as nome_usuario', 'farmacias.nome as nome_farmacia')
+        ->where('mov_farmacia.farmacia',$id)
+        ->get();
+        
+        return response()->json($mov_farmacia);
+    }
+
     public function update(Request $request, $id)
     {
         $mov_farmacia = MovFarmacia::findOrFail($id);
