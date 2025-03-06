@@ -12,6 +12,8 @@ use App\Http\Controllers\MovChequeController;
 use App\Http\Controllers\MovChequeCrecheController;
 use App\Http\Controllers\ChqCategoriaController;
 use App\Http\Controllers\ChqCategoriaAssociadoController;
+use App\Http\Controllers\MovCrecheController;
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -52,6 +54,10 @@ Route::middleware('auth.jwt')->group(function () {
 
     //CHQ_CATEGORIAS_ASSOCIADOS
     Route::apiResource('chq_categorias_associados', ChqCategoriaAssociadoController::class);
+
+    //MOV_CRECHES
+    Route::apiResource('mov_creches', MovCrecheController::class);
+
 
     
 });
