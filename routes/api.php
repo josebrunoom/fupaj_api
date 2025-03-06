@@ -40,10 +40,10 @@ Route::middleware('auth.jwt')->group(function () {
     Route::apiResource('mov_filtrosolar', MovFiltroSolarController::class);
 
     //MOV CHEQUES
-    Route::apiResource('mov-cheques', MovChequeController::class);
+    Route::apiResource('mov_cheques', MovChequeController::class);
 
     //MOV CHEQUES
-    Route::apiResource('mov-chequescreches', MovChequeCrecheController::class);
+    Route::apiResource('mov_chequescreches', MovChequeCrecheController::class);
 
     
 });
