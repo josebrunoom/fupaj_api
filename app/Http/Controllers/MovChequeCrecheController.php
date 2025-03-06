@@ -41,7 +41,7 @@ class MovChequeCrecheController extends Controller
     // Exibir um registro específico
     public function show($id)
     {
-        $movChequeCreche = MovChequeCreche::where('AUTONUMERO', $id)->first();
+        $movChequeCreche = MovChequeCreche::find($id);
 
         if (!$movChequeCreche) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
@@ -51,8 +51,8 @@ class MovChequeCrecheController extends Controller
     }
 
     public function update(Request $request, $id): JsonResponse
-{
-    $movChequeCreche = MovChequeCreche::where('AUTONUMERO', $id)->first();
+    {
+    $movChequeCreche = MovChequeCreche::find($id);
 
     if (!$movChequeCreche) {
         return response()->json(['message' => 'Registro não encontrado'], 404);
@@ -78,7 +78,7 @@ class MovChequeCrecheController extends Controller
 
     $movChequeCreche->update($request->all());
 
-    return response()->json($movChequeCreche);
+    return response()->json(['message' => 'Registro atualizado com sucesso', 'data' => $movChequeCreche]);
 }
 
 

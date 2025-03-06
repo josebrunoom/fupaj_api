@@ -14,12 +14,12 @@ class CreateMovChequescrechesTable extends Migration
     public function up()
     {
         Schema::create('mov_chequescreches', function (Blueprint $table) {
-            $table->bigIncrements('AUTONUMERO');  // BIGINT AUTO_INCREMENT
+            $table->id();
             $table->integer('NUMCHEQUE')->nullable();
             $table->float('VALOR')->nullable();
             $table->integer('CATEGORIA')->nullable();
-            $table->tinyInteger('IMPRESSO')->default(0);  // TINYINT para bit
-            $table->tinyInteger('CANCELADO')->default(0);  // TINYINT para bit
+            $table->tinyInteger('IMPRESSO')->default(0);
+            $table->tinyInteger('CANCELADO')->default(0);
             $table->dateTime('DATA')->nullable();
             $table->string('NOMINAL', 50)->nullable();
             $table->dateTime('DATACADASTRO')->nullable();
