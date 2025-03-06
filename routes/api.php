@@ -11,6 +11,7 @@ use App\Http\Controllers\MovFiltroSolarController;
 use App\Http\Controllers\MovChequeController;
 use App\Http\Controllers\MovChequeCrecheController;
 use App\Http\Controllers\ChqCategoriaController;
+use App\Http\Controllers\ChqCategoriaAssociadoController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -48,6 +49,9 @@ Route::middleware('auth.jwt')->group(function () {
 
     //CHQ_CATEGORIAS
     Route::apiResource('chq_categorias', ChqCategoriaController::class);
+
+    //CHQ_CATEGORIAS_ASSOCIADOS
+    Route::apiResource('chq_categorias_associados', ChqCategoriaAssociadoController::class);
 
     
 });
