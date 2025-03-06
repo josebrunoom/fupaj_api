@@ -10,6 +10,7 @@ use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\MovFiltroSolarController;
 use App\Http\Controllers\MovChequeController;
 use App\Http\Controllers\MovChequeCrecheController;
+use App\Http\Controllers\ChqCategoriaController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -44,6 +45,9 @@ Route::middleware('auth.jwt')->group(function () {
 
     //MOV CHEQUES
     Route::apiResource('mov_chequescreches', MovChequeCrecheController::class);
+
+    //CHQ_CATEGORIAS
+    Route::apiResource('chq_categorias', ChqCategoriaController::class);
 
     
 });
