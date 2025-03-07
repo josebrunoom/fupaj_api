@@ -20,15 +20,19 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth.jwt')->group(function () {
-
+    
     //USERS
     Route::get('/users', [AuthController::class, 'index']);
     Route::get('/users/{id}', [AuthController::class, 'show']);
     Route::put('/users/{id}', [AuthController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
-
+    
     Route::delete('/users/{id}', [AuthController::class, 'destroy']);
+    Route::get('/users_near_21', [AuthController::class, 'getUsersNear21']);
+
+    
+
 
     //EMPRESAS
     Route::apiResource('empresas', EmpresaController::class);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -48,6 +49,20 @@ class AuthController extends Controller
         }
     }
 
+    public function getUsersNear21()
+{
+    try {
+        $dateLimit = Carbon::now()->addMonths(1);
+        $twentyOneBirthday = $dateLimit->subYears(21);
+
+        $users = User::whereRaw('DATE(NASCIMENTO) = ?', [$twentyOneBirthday->toDateString()])
+                     ->get();
+        return response()->json($users);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Erro ao buscar usuários'], 500);
+    }
+}
+    
     private function checkDuplicatedInformation($usuario)
     {
         if (isset($usuario['email'])) {
@@ -122,6 +137,6 @@ class AuthController extends Controller
     {
         User::destroy($id);
         return response()->json(['message' => 'Usuario excluído com sucesso']);
-    }
+    }    
 }
 
