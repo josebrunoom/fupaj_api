@@ -9,7 +9,12 @@ class MovFiltroSolarController extends Controller
 {
     public function index()
     {
-        return response()->json(MovFiltroSolar::all());
+        $mov_filtro = MovFiltroSolar::join('users','users.id','=','mov_filtrosolar.associado')
+        ->join('farmacias','farmacias.codigo','=','mov_filtrosolar.farmacia')
+        ->select('mov_filtrosolar.*', 'users.NOME as nome_usuario', 'farmacias.nome as nome_farmacia')
+        ->get();
+
+        return response()->json($mov_filtro);
     }
 
     public function store(Request $request)
