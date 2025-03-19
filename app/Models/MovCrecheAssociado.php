@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MovCrecheAssociado extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'mov_creches_associados';
 
@@ -21,6 +22,11 @@ class MovCrecheAssociado extends Model
         'observacao',
         'status',
         'usuario',
-        'datahora'
+        'datahora',
+        'observacao_delete' // Adicionado para suportar soft delete com observação
     ];
+    
+    protected $dates = ['deleted_at'];
+
+    public $timestamps = true;
 }

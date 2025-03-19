@@ -49,19 +49,43 @@ class AuthController extends Controller
         }
     }
 
-    public function getUsersNear21()
-{
-    try {
-        $dateLimit = Carbon::now()->addMonths(1);
-        $twentyOneBirthday = $dateLimit->subYears(21);
+    public function getUsersNearAgeLimits() {
+        try {
+            $dateNow = Carbon::now();
+            $dateLimit = $dateNow->copy()->addMonths(1);
+    
+            // Criando cópias para evitar alterar o mesmo objeto Carbon
+            $twentyOneBirthday = $dateLimit->copy()->subYears(21)->toDateString();
+            $twentyFourBirthday = $dateLimit->copy()->subYears(24)->toDateString();
+            $fortyBirthday = $dateLimit->copy()->subYears(40)->toDateString();
+    
+            // Parentescos considerados dependentes
+            $dependents = [
+                '10-FILHOS', '11-FILHOS', '12-FILHOS', '13-FILHOS', '30-FILHAS',
+                '31-FILHAS', '32-FILHAS', '34-FILHAS', '35-FILHAS', 
+                'ENTEADO', 'ENTEADA', 'ENTADO (A)', 'ENTEADO (A)', 
+                '60-OUTROS DEPENDENTES'
+            ];
+    
+            // Parentesco considerado agregado
+            $aggregates = ['90-AGREGADOS'];
+    
+            $dependentsQuery = User::whereIn('PARENTESCO', $dependents)
+                ->whereBetween('NASCIMENTO', [$twentyFourBirthday . ' 00:00:00', $twentyFourBirthday . ' 23:59:59'])
+                ->orWhereBetween('NASCIMENTO', [$twentyOneBirthday . ' 00:00:00', $twentyOneBirthday . ' 23:59:59']);
 
-        $users = User::whereRaw('DATE(NASCIMENTO) = ?', [$twentyOneBirthday->toDateString()])
-                     ->get();
-        return response()->json($users);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Erro ao buscar usuários'], 500);
+            $aggregatesQuery = User::whereIn('PARENTESCO', $aggregates)
+                ->whereBetween('NASCIMENTO', [$fortyBirthday . ' 00:00:00', $fortyBirthday . ' 23:59:59']);
+
+            // Une as consultas
+            $users = $dependentsQuery->union($aggregatesQuery)->get();
+    
+            return response()->json($users);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao buscar usuários', 'message' => $e->getMessage()], 500);
+        }
     }
-}
+    
     
     private function checkDuplicatedInformation($usuario)
     {
@@ -87,15 +111,35 @@ class AuthController extends Controller
         return null;
     }
 
-    public function login(Request $request) {
-        $credentials = $request->only('email', 'password');
+    public function login(Request $request){
+        $request->validate([
+            'cpf' => 'required|digits:11',
+            'password' => 'required|string|min:5'
+        ]);
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $cpf = preg_replace('/\D/', '', $request->cpf);
+
+        $user = User::where('cpf', $cpf)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuário não encontrado'], 404);
         }
-        
-        return response()->json(['token' => $token]);
-    }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'CPF ou senha incorretos.'], 401);
+        }
+
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'role' => $user->role
+            ]
+        ]);
+    }    
 
     public function index() {
 

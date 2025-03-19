@@ -29,9 +29,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     
     Route::delete('/users/{id}', [AuthController::class, 'destroy']);
-    Route::get('/users_near_21', [AuthController::class, 'getUsersNear21']);
-
-    
+    Route::get('/users_near_21', [AuthController::class, 'getUsersNearAgeLimits']);    
 
 
     //EMPRESAS
@@ -41,9 +39,11 @@ Route::middleware('auth.jwt')->group(function () {
     Route::apiResource('farmacias', FarmaciaController::class);
 
     //MOV FARMACIAS
+    Route::get('mov_farmacia/trashed', [MovCrecheController::class, 'trashed']);
     Route::apiResource('mov_farmacia', MovFarmaciaController::class);
-
-    Route::get('/mov_farmacia/farmacia/{id}', [MovFarmaciaController::class, 'showByFarmancia']);
+    Route::delete('mov_farmacia/{id}', [MovCrecheController::class, 'destroy']); // Soft delete com observação
+    Route::patch('mov_farmacia/{id}/restore', [MovCrecheController::class, 'restore']); // Restaura um registro deletado
+    Route::get('/mov_farmacia/farmacia/{id}', [MovFarmaciaController::class, 'showByFarmacia']);
 
     //FILTRO SOLAR
     Route::apiResource('mov_filtrosolar', MovFiltroSolarController::class);
@@ -61,12 +61,16 @@ Route::middleware('auth.jwt')->group(function () {
     Route::apiResource('chq_categorias_associados', ChqCategoriaAssociadoController::class);
 
     //MOV_CRECHES
+    Route::get('mov_creches/trashed', [MovCrecheController::class, 'trashed']);
     Route::apiResource('mov_creches', MovCrecheController::class);
+    Route::delete('mov_creches/{id}', [MovCrecheController::class, 'destroy']); // Soft delete com observação
+    Route::patch('mov_creches/{id}/restore', [MovCrecheController::class, 'restore']); // Restaura um registro deletado
 
     //MOV_CRECHES_ASSOCIADOS
+    Route::get('mov_creches_associados/trashed', [MovCrecheController::class, 'trashed']);
     Route::apiResource('mov_creches_associados', MovCrecheAssociadoController::class);
-
-
+    Route::delete('mov_creches_associados/{id}', [MovCrecheController::class, 'destroy']); // Soft delete com observação
+    Route::patch('mov_creches_associados/{id}/restore', [MovCrecheController::class, 'restore']); // Restaura um registro deletado
     
 });
 

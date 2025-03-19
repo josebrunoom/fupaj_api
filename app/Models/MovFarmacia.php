@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MovFarmacia extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'mov_farmacia';
     protected $primaryKey = 'id';
@@ -16,6 +17,8 @@ class MovFarmacia extends Model
     protected $fillable = [
         'numnota', 'farmacia', 'associado', 'valornota', 
         'valorfundacao', 'valorassociado', 'lancamento', 'emissao',
-        'receita_sn', 'usuario', 'datahora'
+        'receita_sn', 'usuario', 'datahora', 'observacao_delete'
     ];
+
+    protected $dates = ['deleted_at'];
 }
