@@ -44,6 +44,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::delete('mov_farmacia/{id}', [MovCrecheController::class, 'destroy']); // Soft delete com observação
     Route::patch('mov_farmacia/{id}/restore', [MovCrecheController::class, 'restore']); // Restaura um registro deletado
     Route::get('/mov_farmacia/farmacia/{id}', [MovFarmaciaController::class, 'showByFarmacia']);
+    Route::put('/mov_farmacia/{id}', [MovFarmaciaController::class, 'update']);
+
 
     //FILTRO SOLAR
     Route::apiResource('mov_filtrosolar', MovFiltroSolarController::class);

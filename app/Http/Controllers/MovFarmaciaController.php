@@ -40,7 +40,14 @@ class MovFarmaciaController extends Controller
             'receita_sn' => 'nullable|string|max:3',
             'usuario' => 'nullable|string|max:10',
             'datahora' => 'nullable|date',
+            'pdf' => 'nullable|file|mimes:pdf|max:2048'
         ]);
+
+        if ($request->hasFile('pdf')) {
+            $file = $request->file('pdf');
+            $filePath = $file->store('pdfs', 'public'); // Salva em storage/app/public/pdfs
+            $data['pdf_path'] = $filePath;
+        }
 
         $mov_farmacia = MovFarmacia::create($data);
         return response()->json($mov_farmacia, 201);
@@ -63,9 +70,7 @@ class MovFarmaciaController extends Controller
         return response()->json($mov_farmacia);
     }
 
-    // Atualiza um registro (mesmo que esteja deletado)
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         $mov_farmacia = MovFarmacia::withTrashed()->find($id);
 
         if (!$mov_farmacia) {
@@ -84,9 +89,28 @@ class MovFarmaciaController extends Controller
             'receita_sn' => 'nullable|string|max:3',
             'usuario' => 'nullable|string|max:10',
             'datahora' => 'nullable|date',
+            'pdf' => 'nullable|file|mimes:pdf|max:2048' // Apenas PDFs até 2MB
         ]);
 
+        // Verifica se um novo PDF foi enviado
+        if ($request->hasFile('pdf')) {
+            // Remove o arquivo antigo, se existir
+            if ($mov_farmacia->pdf_path) {
+                Storage::disk('public')->delete($mov_farmacia->pdf_path);
+            }
+
+            // Salva o novo arquivo e atualiza o caminho
+            $file = $request->file('pdf');
+            $filePath = $file->store('pdfs', 'public'); // Salva em storage/app/public/pdfs
+            $data['pdf_path'] = $filePath;
+        } else {
+            // Mantém o PDF atual se não for enviado um novo
+            $data['pdf_path'] = $mov_farmacia->pdf_path;
+        }
+
+        // Atualiza o registro no banco de dados
         $mov_farmacia->update($data);
+
         return response()->json($mov_farmacia);
     }
 

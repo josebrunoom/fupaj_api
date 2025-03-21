@@ -17,7 +17,7 @@ class MovFarmacia extends Model
     protected $fillable = [
         'numnota', 'farmacia', 'associado', 'valornota', 
         'valorfundacao', 'valorassociado', 'lancamento', 'emissao',
-        'receita_sn', 'usuario', 'datahora', 'observacao_delete'
+        'receita_sn', 'usuario', 'datahora', 'observacao_delete', 'pdf_path'
     ];
 
     protected $dates = ['deleted_at'];
