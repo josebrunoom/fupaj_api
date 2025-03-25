@@ -4,6 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Farmacia;
+use App\Models\MovCheque;
+use App\Models\MovChequeCreche;
+use App\Models\MovCreche;
+use App\Models\MovCrecheAssociado;
+use App\Models\ChqCategoria;
+use App\Models\ChqCategoriaAssociado;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -66,21 +73,37 @@ class AuthController extends Controller
                 'ENTEADO', 'ENTEADA', 'ENTADO (A)', 'ENTEADO (A)', 
                 '60-OUTROS DEPENDENTES'
             ];
+
+            $retorno = [];
     
             // Parentesco considerado agregado
             $aggregates = ['90-AGREGADOS'];
     
             $dependentsQuery = User::whereIn('PARENTESCO', $dependents)
                 ->whereBetween('NASCIMENTO', [$twentyFourBirthday . ' 00:00:00', $twentyFourBirthday . ' 23:59:59'])
-                ->orWhereBetween('NASCIMENTO', [$twentyOneBirthday . ' 00:00:00', $twentyOneBirthday . ' 23:59:59']);
+                ->orWhereBetween('NASCIMENTO', [$twentyOneBirthday . ' 00:00:00', $twentyOneBirthday . ' 23:59:59'])
+                ->select('id', 'NOME', 'CPF', 'NASCIMENTO', 'PARENTESCO');
 
             $aggregatesQuery = User::whereIn('PARENTESCO', $aggregates)
-                ->whereBetween('NASCIMENTO', [$fortyBirthday . ' 00:00:00', $fortyBirthday . ' 23:59:59']);
+                ->whereBetween('NASCIMENTO', [$fortyBirthday . ' 00:00:00', $fortyBirthday . ' 23:59:59'])
+                ->select('id', 'NOME', 'CPF', 'NASCIMENTO', 'PARENTESCO');
+
 
             // Une as consultas
-            $users = $dependentsQuery->union($aggregatesQuery)->get();
-    
-            return response()->json($users);
+            $retorno['dependents'] = $dependentsQuery->union($aggregatesQuery)->get();
+
+            $retorno['users'] = User::all()->count();
+            $retorno['associados'] = User::where('PARENTESCO', '00-TITULAR')->count();
+            $retorno['instituicoes'] = Farmacia::all()->count();
+            $retorno['beneficios'] = 
+                                    MovCheque::count() +
+                                    MovChequeCreche::count() +
+                                    MovCreche::count() +
+                                    MovCrecheAssociado::count() +
+                                    ChqCategoria::count() +
+                                    ChqCategoriaAssociado::count();
+                                    
+            return response()->json($retorno);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao buscar usuários', 'message' => $e->getMessage()], 500);
         }
