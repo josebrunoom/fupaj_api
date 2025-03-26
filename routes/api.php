@@ -27,10 +27,15 @@ Route::middleware('auth.jwt')->group(function () {
     Route::put('/users/{id}', [AuthController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
-    
-    Route::delete('/users/{id}', [AuthController::class, 'destroy']);
-    Route::get('/users_near_21', [AuthController::class, 'getUsersNearAgeLimits']);    
 
+    //USUÁRIOS PRESTES A FAZER 21, 24 E 40 ANOS
+    Route::delete('/users/{id}', [AuthController::class, 'destroy']);
+    Route::get('/users_near_21', [AuthController::class, 'getUsersNearAgeLimits']);
+
+    //ENDPOINTS PARA ASSOCIADOS, AGREGADOS E DEPENDENTES
+    Route::get('/associados', [AuthController::class, 'getAssociados']);
+    Route::get('/dependentes', [AuthController::class, 'getDependentes']);
+    Route::get('/agregados', [AuthController::class, 'getAgregados']);
 
     //EMPRESAS
     Route::apiResource('empresas', EmpresaController::class);

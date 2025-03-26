@@ -113,6 +113,31 @@ class AuthController extends Controller
         }
     }  
     
+    public function getAssociados()
+    {
+        $users = User::where('PARENTESCO', '00-TITULAR')->get();
+        return response()->json(['associados' => $users]);
+    }
+
+    public function getDependentes()
+    {
+        $dependents = [
+            '10-FILHOS', '11-FILHOS', '12-FILHOS', '13-FILHOS', '30-FILHAS',
+            '31-FILHAS', '32-FILHAS', '34-FILHAS', '35-FILHAS', 
+            'ENTEADO', 'ENTEADA', 'ENTADO (A)', 'ENTEADO (A)', 
+            '60-OUTROS DEPENDENTES'
+        ];
+
+        $users = User::whereIn('PARENTESCO', $dependents)->get();
+        return response()->json(['dependentes' => $users]);
+    }
+    
+    public function getAgregados()
+    {
+        $aggregates = ['90-AGREGADOS'];
+        $users = User::whereIn('PARENTESCO', $aggregates)->get();
+        return response()->json(['agregados' => $users]);
+    }
     
     private function checkDuplicatedInformation($usuario)
     {
