@@ -59,39 +59,43 @@ class AuthController extends Controller
     public function getUsersNearAgeLimits() {
         try {
             $dateNow = Carbon::now();
-            $dateLimit = $dateNow->copy()->addMonths(1);
+            $dateLimit = $dateNow->copy()->addMonths(3);
     
-            // Criando cópias para evitar alterar o mesmo objeto Carbon
-            $twentyOneBirthday = $dateLimit->copy()->subYears(21)->toDateString();
-            $twentyFourBirthday = $dateLimit->copy()->subYears(24)->toDateString();
-            $fortyBirthday = $dateLimit->copy()->subYears(40)->toDateString();
+            // Definição do intervalo de 3 meses
+            $twentyOneStart = $dateNow->copy()->subYears(21)->toDateString();
+            $twentyOneEnd = $dateLimit->copy()->subYears(21)->toDateString();
     
-            // Parentescos considerados dependentes
+            $twentyFourStart = $dateNow->copy()->subYears(24)->toDateString();
+            $twentyFourEnd = $dateLimit->copy()->subYears(24)->toDateString();
+    
+            $fortyStart = $dateNow->copy()->subYears(40)->toDateString();
+            $fortyEnd = $dateLimit->copy()->subYears(40)->toDateString();
+    
             $dependents = [
                 '10-FILHOS', '11-FILHOS', '12-FILHOS', '13-FILHOS', '30-FILHAS',
                 '31-FILHAS', '32-FILHAS', '34-FILHAS', '35-FILHAS', 
                 'ENTEADO', 'ENTEADA', 'ENTADO (A)', 'ENTEADO (A)', 
                 '60-OUTROS DEPENDENTES'
             ];
-
+    
             $retorno = [];
     
-            // Parentesco considerado agregado
             $aggregates = ['90-AGREGADOS'];
     
+            // Dependentes entre 21 e 24 anos nos próximos 3 meses
             $dependentsQuery = User::whereIn('PARENTESCO', $dependents)
-                ->whereBetween('NASCIMENTO', [$twentyFourBirthday . ' 00:00:00', $twentyFourBirthday . ' 23:59:59'])
-                ->orWhereBetween('NASCIMENTO', [$twentyOneBirthday . ' 00:00:00', $twentyOneBirthday . ' 23:59:59'])
+                ->whereBetween('NASCIMENTO', [$twentyFourStart, $twentyFourEnd])
+                ->orWhereBetween('NASCIMENTO', [$twentyOneStart, $twentyOneEnd])
                 ->select('id', 'NOME', 'CPF', 'NASCIMENTO', 'PARENTESCO');
-
+    
+            // Agregados que completam 40 anos nos próximos 3 meses
             $aggregatesQuery = User::whereIn('PARENTESCO', $aggregates)
-                ->whereBetween('NASCIMENTO', [$fortyBirthday . ' 00:00:00', $fortyBirthday . ' 23:59:59'])
+                ->whereBetween('NASCIMENTO', [$fortyStart, $fortyEnd])
                 ->select('id', 'NOME', 'CPF', 'NASCIMENTO', 'PARENTESCO');
-
-
+    
             // Une as consultas
             $retorno['dependents'] = $dependentsQuery->union($aggregatesQuery)->get();
-
+    
             $retorno['users'] = User::all()->count();
             $retorno['associados'] = User::where('PARENTESCO', '00-TITULAR')->count();
             $retorno['instituicoes'] = Farmacia::all()->count();
@@ -107,7 +111,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao buscar usuários', 'message' => $e->getMessage()], 500);
         }
-    }
+    }  
     
     
     private function checkDuplicatedInformation($usuario)
