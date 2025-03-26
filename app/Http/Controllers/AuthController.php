@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Farmacia;
 use App\Models\MovCheque;
 use App\Models\MovChequeCreche;
+use App\Models\Farmacia;
+use App\Models\MovFarmacia;
 use App\Models\MovCreche;
 use App\Models\MovCrecheAssociado;
 use App\Models\ChqCategoria;
@@ -131,13 +132,50 @@ class AuthController extends Controller
         $users = User::whereIn('PARENTESCO', $dependents)->get();
         return response()->json(['dependentes' => $users]);
     }
-    
+
     public function getAgregados()
     {
         $aggregates = ['90-AGREGADOS'];
         $users = User::whereIn('PARENTESCO', $aggregates)->get();
         return response()->json(['agregados' => $users]);
     }
+
+    public function getLancamentos(Request $request){
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuário não autenticado'], 401);
+        }
+
+        $lancamentos = [];
+
+        if ($user->role == 1) {
+            $lancamentos = [
+                'farmacia' => MovFarmacia::where('associado', $user->id)->get(),
+                'creche' => MovCreche::where('associado', $user->id)->get(),
+                'creche_associado' => MovCrecheAssociado::where('associado', $user->id)->get(),
+            ];
+        } elseif ($user->role == 3) {
+            $lancamentos = [
+                'farmacia' => MovFarmacia::all(),
+                'creche' => MovCreche::all(),
+                'creche_associado' => MovCrecheAssociado::all(),
+            ];
+        } else {
+            return response()->json(['error' => 'Permissão negada'], 403);
+        }
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'role' => $user->role
+            ],
+            'lancamentos' => $lancamentos
+        ]);
+    }
+
+
     
     private function checkDuplicatedInformation($usuario)
     {

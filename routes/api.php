@@ -37,6 +37,8 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/dependentes', [AuthController::class, 'getDependentes']);
     Route::get('/agregados', [AuthController::class, 'getAgregados']);
 
+    Route::get('/lancamentos', [AuthController::class, 'getLancamentos']);
+
     //EMPRESAS
     Route::apiResource('empresas', EmpresaController::class);
 
