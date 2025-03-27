@@ -12,16 +12,9 @@ class ChqCategoriaController extends Controller
      * Listar todas as categorias.
      */
     public function index(): JsonResponse
-{
-    // Realizando o INNER JOIN com as tabelas 'users' e 'categorias'
-    $cheques = ChqCategoria::join('users', 'users.id', '=', 'chq_categorias.user_id')
-        ->join('categorias', 'categorias.id', '=', 'chq_categorias.categoria_id')
-        ->select('chq_categorias.*', 'users.name as associado_name', 'categorias.name as categoria_name')
-        ->get();
-
-    return response()->json($cheques);
-}
-
+    {
+        return response()->json(ChqCategoria::all());
+    }
 
     /**
      * Criar uma nova categoria.
@@ -86,5 +79,4 @@ class ChqCategoriaController extends Controller
 
         return response()->json(['message' => 'Registro excluído com sucesso']);
     }
-
 }
