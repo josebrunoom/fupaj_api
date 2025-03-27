@@ -4,13 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\MovCheque;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class MovChequeController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(MovCheque::all());
+        $cheques = MovCheque::join('users', 'users.id', '=', 'mov_cheques.associado') 
+            ->join('chq_categorias', 'chq_categorias.id', '=', 'mov_cheques.categoria') 
+            ->select(
+                'mov_cheques.*',   
+                'users.NOME as associado_name',
+                'chq_categorias.descricao as categoria_name' 
+            )
+            ->get();
+
+        return response()->json($cheques);
     }
+
+
 
     public function store(Request $request)
     {
