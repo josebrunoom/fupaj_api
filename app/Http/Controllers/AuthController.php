@@ -150,11 +150,17 @@ class AuthController extends Controller
         $lancamentos = [];
 
         if ($user->role == 1) {
+
             $lancamentos = [
-                'farmacia' => MovFarmacia::where('associado', $user->id)->get(),
+                'farmacia' => MovFarmacia::where('associado', $user->id)
+                    ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo') 
+                    ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome')  
+                    ->get(),
                 'creche' => MovCreche::where('associado', $user->id)->get(),
                 'creche_associado' => MovCrecheAssociado::where('associado', $user->id)->get(),
             ];
+            
+            
         } elseif ($user->role == 3) {
             $lancamentos = [
                 'farmacia' => MovFarmacia::all(),
