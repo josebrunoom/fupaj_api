@@ -163,7 +163,10 @@ class AuthController extends Controller
             
         } elseif ($user->role == 3) {
             $lancamentos = [
-                'farmacia' => MovFarmacia::all(),
+                'farmacia' => MovFarmacia::where('associado', $user->id)
+                    ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo') 
+                    ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome')  
+                    ->get(),
                 'creche' => MovCreche::all(),
                 'creche_associado' => MovCrecheAssociado::all(),
             ];
