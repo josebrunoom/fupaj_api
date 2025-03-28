@@ -12,8 +12,7 @@ class ChqCategoriaAssociadoController extends Controller
         return response()->json(ChqCategoriaAssociado::all());
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $data = $request->validate([
             'categoria' => 'required|integer',
             'associado' => 'required|integer',
@@ -21,9 +20,19 @@ class ChqCategoriaAssociadoController extends Controller
             'datahora' => 'nullable|date'
         ]);
 
+        $registroExistente = ChqCategoriaAssociado::where('categoria', $data['categoria'])
+            ->where('associado', $data['associado'])
+            ->first();
+
+        if ($registroExistente) {
+            $registroExistente->delete();
+            return response()->json(['message' => 'categoria removida com sucesso'], 200);
+        } 
+
         $registro = ChqCategoriaAssociado::create($data);
         return response()->json($registro, 201);
     }
+
 
     public function show($id)
     {

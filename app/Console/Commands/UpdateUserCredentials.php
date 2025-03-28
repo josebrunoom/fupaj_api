@@ -20,7 +20,7 @@ class UpdateUserCredentials extends Command
      *
      * @var string
      */
-    protected $description = 'Atualiza o campo email e senha dos usuários usando o CPF, ignorando duplicatas';
+    protected $description = 'Atualiza o campo email e senha dos usuários usando o CPF, ignorando duplicatas, priorizando usuários com SITUACAO ATIVO';
 
     /**
      * Execute the console command.
@@ -29,35 +29,49 @@ class UpdateUserCredentials extends Command
      */
     public function handle()
     {
-        $users = DB::table('users')->whereNotNull('CPF')->get();
+        // Obtém todos os usuários com CPF válido e prioriza os que estão ATIVO
+        $users = DB::table('users')
+            ->whereNotNull('CPF')
+            ->orderByRaw("CASE WHEN SITUACAO = 'ATIVO' THEN 1 ELSE 2 END")
+            ->get();
+
         $processedCpfs = []; // Lista para armazenar CPFs já processados
 
         foreach ($users as $user) {
             $cpf = preg_replace('/\D/', '', $user->CPF); // Remove caracteres não numéricos
 
-            if (strlen($cpf) === 11) {
-                // Se o CPF já foi processado, pula esse usuário
-                if (in_array($cpf, $processedCpfs)) {
-                    $this->warn("CPF {$cpf} já foi atualizado. Pulando usuário ID {$user->id}");
-                    continue;
-                }
-
-                $email = $cpf; // CPF direto no campo email
-                $password = substr($cpf, 0, 5); // Primeiros 5 dígitos do CPF
-                $hashedPassword = Hash::make($password); // Criptografando a senha
-
-                DB::table('users')->where('id', $user->id)->update([
-                    'email' => $email,
-                    'password' => $hashedPassword,
-                ]);
-
-                $this->info("Credenciais atualizadas para o usuário ID {$user->id}");
-
-                // Adiciona o CPF à lista de CPFs já processados
-                $processedCpfs[] = $cpf;
-            } else {
-                $this->warn("CPF inválido para o usuário ID {$user->id}");
+            // Garante que o CPF tenha pelo menos 5 dígitos, senão usa um fallback
+            if (strlen($cpf) < 5) {
+                $cpf = str_pad($cpf, 5, '0', STR_PAD_RIGHT); // Preenche com zeros à direita se necessário
+                $this->warn("CPF {$user->CPF} ajustado para {$cpf} para o usuário ID {$user->id}");
             }
+
+            // Se o CPF já foi processado, pula esse usuário
+            if (in_array($cpf, $processedCpfs)) {
+                $this->warn("CPF {$cpf} já foi atualizado. Pulando usuário ID {$user->id}");
+                continue;
+            }
+
+            // Verifica se o email já existe na base de dados
+            $emailExists = DB::table('users')->where('email', $cpf)->exists();
+            if ($emailExists) {
+                $this->warn("Email {$cpf} já existe. Pulando usuário ID {$user->id}");
+                continue;
+            }
+
+            $email = $cpf; // CPF direto no campo email
+            $password = substr($cpf, 0, 5); // Primeiros 5 dígitos do CPF
+            $hashedPassword = Hash::make($password); // Criptografando a senha
+
+            DB::table('users')->where('id', $user->id)->update([
+                'email' => $email,
+                'password' => $hashedPassword,
+            ]);
+
+            $this->info("Credenciais atualizadas para o usuário ID {$user->id}");
+
+            // Adiciona o CPF à lista de CPFs já processados
+            $processedCpfs[] = $cpf;
         }
 
         return 0;
