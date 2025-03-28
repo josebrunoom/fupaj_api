@@ -142,38 +142,60 @@ class AuthController extends Controller
 
     public function getLancamentos(Request $request){
         $user = auth()->user();
-
+    
         if (!$user) {
             return response()->json(['error' => 'Usuário não autenticado'], 401);
         }
-
+    
         $lancamentos = [];
-
+    
         if ($user->role == 1) {
-
             $lancamentos = [
                 'farmacia' => MovFarmacia::where('associado', $user->id)
                     ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo') 
                     ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome')  
-                    ->get(),
-                'creche' => MovCreche::where('associado', $user->id)->get(),
+                    ->get()->map(function($mov) {
+                        $mov->lancamento = Carbon::parse($mov->lancamento)->format('d/m/Y H:i');
+                        $mov->emissao = Carbon::parse($mov->emissao)->format('d/m/Y H:i');
+                        $mov->datahora = Carbon::parse($mov->datahora)->format('d/m/Y H:i');
+                        return $mov;
+                    }),
+                'creche' => MovCreche::where('associado', $user->id)->get()->map(function($creche) {
+                    $creche->lancamento = Carbon::parse($creche->lancamento)->format('d/m/Y H:i');
+                    $creche->pagamento = Carbon::parse($creche->pagamento)->format('d/m/Y H:i');
+                    $creche->datahora = Carbon::parse($creche->datahora)->format('d/m/Y H:i');
+                    return $creche;
+                }),
                 'creche_associado' => MovCrecheAssociado::where('associado', $user->id)->get(),
             ];
-            
-            
         } elseif ($user->role == 3) {
             $lancamentos = [
                 'farmacia' => MovFarmacia::where('associado', $user->id)
                     ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo') 
                     ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome')  
-                    ->get(),
-                'creche' => MovCreche::all(),
-                'creche_associado' => MovCrecheAssociado::all(),
+                    ->get()->map(function($mov) {
+                        $mov->lancamento = Carbon::parse($mov->lancamento)->format('d/m/Y H:i');
+                        $mov->emissao = Carbon::parse($mov->emissao)->format('d/m/Y H:i');
+                        $mov->datahora = Carbon::parse($mov->datahora)->format('d/m/Y H:i');
+                        return $mov;
+                    }),
+                'creche' => MovCreche::all()->map(function($creche) {
+                    $creche->lancamento = Carbon::parse($creche->lancamento)->format('d/m/Y H:i');
+                    $creche->pagamento = Carbon::parse($creche->pagamento)->format('d/m/Y H:i');
+                    $creche->datahora = Carbon::parse($creche->datahora)->format('d/m/Y H:i');
+                    return $creche;
+                }),
+                'creche_associado' => MovCrecheAssociado::all()->map(function($creche_associado) {
+                    $creche_associado->lancamento = Carbon::parse($creche_associado->lancamento)->format('d/m/Y H:i');
+                    $creche_associado->pagamento = Carbon::parse($creche_associado->pagamento)->format('d/m/Y H:i');
+                    $creche_associado->datahora = Carbon::parse($creche_associado->datahora)->format('d/m/Y H:i');
+                    return $creche_associado;
+                }),
             ];
         } else {
             return response()->json(['error' => 'Permissão negada'], 403);
         }
-
+    
         return response()->json([
             'user' => [
                 'id' => $user->id,
@@ -183,6 +205,7 @@ class AuthController extends Controller
             'lancamentos' => $lancamentos
         ]);
     }
+    
 
 
     
