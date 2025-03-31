@@ -118,12 +118,21 @@ class AuthController extends Controller
     
     public function getAssociados()
     {
-        $users = User::where('PARENTESCO', '00-TITULAR')->get();
+        $formatDate = function ($date) {
+            return ($date && $date !== '0000-00-00 00:00:00') 
+                ? Carbon::parse($date)->format('d/m/Y') 
+                : null;
+        };
+
+        $users = User::where('PARENTESCO', '00-TITULAR')->get()->map(function ($user) use ($formatDate) {
+            $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
+            $user->DATAHORA = $formatDate($user->DATAHORA);
+            return $user;
+        });
         return response()->json(['associados' => $users]);
     }
 
-    public function getDependentes()
-    {
+    public function getDependentes(){
         $dependents = [
             '10-FILHOS', '11-FILHOS', '12-FILHOS', '13-FILHOS', '30-FILHAS',
             '31-FILHAS', '32-FILHAS', '34-FILHAS', '35-FILHAS', 
@@ -131,14 +140,36 @@ class AuthController extends Controller
             '60-OUTROS DEPENDENTES'
         ];
 
-        $users = User::whereIn('PARENTESCO', $dependents)->get();
+        $formatDate = function ($date) {
+            return ($date && $date !== '0000-00-00 00:00:00') 
+                ? Carbon::parse($date)->format('d/m/Y') 
+                : null;
+        };
+
+        $users = User::whereIn('PARENTESCO', $dependents)->get()->map(function ($user) use ($formatDate) {
+            $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
+            $user->DATAHORA = $formatDate($user->DATAHORA);
+            return $user;
+        });
+
         return response()->json(['dependentes' => $users]);
     }
 
-    public function getAgregados()
-    {
+    public function getAgregados() {
         $aggregates = ['90-AGREGADOS'];
-        $users = User::whereIn('PARENTESCO', $aggregates)->get();
+
+        $formatDate = function ($date) {
+            return ($date && $date !== '0000-00-00 00:00:00') 
+                ? Carbon::parse($date)->format('d/m/Y') 
+                : null;
+        };
+
+        $users = User::whereIn('PARENTESCO', $aggregates)->get()->map(function ($user) use ($formatDate) {
+            $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
+            $user->DATAHORA = $formatDate($user->DATAHORA);
+            return $user;
+        });
+
         return response()->json(['agregados' => $users]);
     }
 
