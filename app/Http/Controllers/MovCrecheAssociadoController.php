@@ -5,14 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\MovCrecheAssociado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
 
 class MovCrecheAssociadoController extends Controller
 {
     // Retorna apenas registros ativos (não deletados)
-    public function index()
-    {
-        return response()->json(MovCrecheAssociado::whereNull('deleted_at')->get());
+    public function index(): JsonResponse {
+        $creches = MovCrecheAssociado::join('users', 'users.id', '=', 'mov_creches_associados.associado')
+            ->whereNull('mov_creches_associados.deleted_at')
+            ->select(
+                'mov_creches_associados.*',   
+                'users.NOME as associado_name'
+            )
+            ->get();
+
+        return response()->json($creches);
     }
+
 
     // Retorna apenas registros deletados (soft deleted)
     public function trashed()
