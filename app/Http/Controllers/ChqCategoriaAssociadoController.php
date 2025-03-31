@@ -4,12 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\ChqCategoriaAssociado;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
 
 class ChqCategoriaAssociadoController extends Controller
 {
-    public function index()
-    {
-        return response()->json(ChqCategoriaAssociado::all());
+    public function index(): JsonResponse{
+        $cheques = ChqCategoriaAssociado::join('users', 'users.id', '=', 'chq_categorias_associado.ASSOCIADO') 
+            ->join('chq_categorias', 'chq_categorias.id', '=', 'chq_categorias_associado.categoria') 
+            ->select(
+                'chq_categorias_associado.*',   
+                'users.NOME as associado_nome', // Nome do associado
+                'chq_categorias.descricao as nome_categoria' // Nome da categoria
+            )
+            ->get();
+
+        return response()->json($cheques);
     }
 
     public function store(Request $request){

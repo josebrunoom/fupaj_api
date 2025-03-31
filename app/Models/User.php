@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\ChqCategoria;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -75,5 +76,9 @@ class User extends Authenticatable implements JWTSubject
                 'role' => $this->role
             ]
         ];
+    }
+
+    public function categorias(){
+        return $this->belongsToMany(ChqCategoria::class, 'user_categoria', 'user_id', 'categoria_id');
     }
 }

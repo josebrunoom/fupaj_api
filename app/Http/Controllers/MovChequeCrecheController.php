@@ -1,18 +1,29 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\ChqCategorias;
 
 use App\Models\MovChequeCreche;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
 
 class MovChequeCrecheController extends Controller
 {
     // Exibir todos os registros
-    public function index()
-    {
-        return response()->json(MovChequeCreche::all());
+    public function index(): JsonResponse{
+        $cheques = MovChequeCreche::join('users', 'users.id', '=', 'mov_chequescreches.ASSOCIADO') 
+            ->join('chq_categorias', 'chq_categorias.id', '=', 'mov_chequescreches.categoria') 
+            ->select(
+                'mov_chequescreches.*',   
+                'users.NOME as associado_nome',
+                'chq_categorias.descricao as nome_categoria'
+            )
+            ->get();
+    
+        return response()->json($cheques);
     }
-
+    
     // Criar um novo registro
     public function store(Request $request)
     {
