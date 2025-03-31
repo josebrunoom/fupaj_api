@@ -6,6 +6,7 @@ use App\Models\MovCreche;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 
 class MovCrecheController extends Controller
 {
@@ -17,8 +18,15 @@ class MovCrecheController extends Controller
                 'users.NOME as associado_name'
             )
             ->whereNull('mov_creches.deleted_at')
-            ->get();
-
+            ->get()
+            ->map(function ($creche) {
+                if ($creche->datahora && $creche->datahora !== '0000-00-00 00:00:00') {
+                    $creche->datahora = Carbon::parse($creche->datahora)->format('d/m/Y H:i');
+                } else {
+                    $creche->datahora = null; 
+                }
+                return $creche;
+            });
         return response()->json($creches);
     }
 
@@ -58,6 +66,12 @@ class MovCrecheController extends Controller
 
         if (!$registro) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
+        }
+
+        if ($registro->datahora && $registro->datahora !== '0000-00-00 00:00:00') {
+            $registro->datahora = Carbon::parse($registro->datahora)->format('d/m/Y H:i');
+        } else {
+            $registro->datahora = null;
         }
 
         return response()->json($registro);

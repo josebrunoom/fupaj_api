@@ -6,7 +6,7 @@ use App\Models\ChqCategorias;
 use App\Models\MovChequeCreche;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-
+use Carbon\Carbon;
 
 class MovChequeCrecheController extends Controller
 {
@@ -19,7 +19,15 @@ class MovChequeCrecheController extends Controller
                 'users.NOME as associado_nome',
                 'chq_categorias.descricao as nome_categoria'
             )
-            ->get();
+            ->get()
+            ->map(function ($cheque) {
+                if ($cheque->DATAHORA && $cheque->DATAHORA !== '0000-00-00 00:00:00') {
+                    $cheque->DATAHORA = Carbon::parse($cheque->DATAHORA)->format('d/m/Y H:i');
+                } else {
+                    $cheque->DATAHORA = null; 
+                }
+                return $cheque;
+            });
     
         return response()->json($cheques);
     }
@@ -52,10 +60,17 @@ class MovChequeCrecheController extends Controller
     // Exibir um registro específico
     public function show($id)
     {
-        $movChequeCreche = MovChequeCreche::find($id);
+            $movChequeCreche = MovChequeCreche::find($id);
 
         if (!$movChequeCreche) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
+        }
+
+        // Verifica e formata a data antes de retornar
+        if ($movChequeCreche->DATAHORA && $movChequeCreche->DATAHORA !== '0000-00-00 00:00:00') {
+            $movChequeCreche->DATAHORA = Carbon::parse($movChequeCreche->DATAHORA)->format('d/m/Y H:i');
+        } else {
+            $movChequeCreche->DATAHORA = null;
         }
 
         return response()->json($movChequeCreche);

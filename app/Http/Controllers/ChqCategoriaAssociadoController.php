@@ -6,7 +6,6 @@ use App\Models\ChqCategoriaAssociado;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-
 class ChqCategoriaAssociadoController extends Controller
 {
     public function index(): JsonResponse{

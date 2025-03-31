@@ -4,12 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Farmacia;
+use Carbon\Carbon;
 
 class FarmaciaController extends Controller
 {
-    public function index()
-    {
-        return response()->json(Farmacia::all());
+    public function index(){
+        $farmacias = Farmacia::all()->map(function ($farmacia) {
+            if ($farmacia->data_hora && $farmacia->data_hora !== '0000-00-00 00:00:00') {
+                $farmacia->data_hora = Carbon::parse($farmacia->data_hora)->format('d/m/Y H:i');
+            } else {
+                $farmacia->data_hora = null;
+            }
+            return $farmacia;
+        });
+    
+        return response()->json($farmacias);
     }
 
     public function store(Request $request)
@@ -33,11 +42,19 @@ class FarmaciaController extends Controller
         return response()->json($farmacia, 201);
     }
 
-    public function show($id)
-    {
+    
+    public function show($id) {
         $farmacia = Farmacia::findOrFail($id);
+    
+        if ($farmacia->data_hora && $farmacia->data_hora !== '0000-00-00 00:00:00') {
+            $farmacia->data_hora = Carbon::parse($farmacia->data_hora)->format('d/m/Y H:i');
+        } else {
+            $farmacia->data_hora = null;
+        }
+    
         return response()->json($farmacia);
     }
+    
 
     public function update(Request $request, $id)
     {
