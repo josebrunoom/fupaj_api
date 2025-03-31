@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ChqCategoriaAssociado;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
+
 
 class ChqCategoriaAssociadoController extends Controller
 {
@@ -16,7 +18,15 @@ class ChqCategoriaAssociadoController extends Controller
                 'users.NOME as associado_nome', // Nome do associado
                 'chq_categorias.descricao as nome_categoria' // Nome da categoria
             )
-            ->get();
+            ->get()
+            ->map(function ($cheque) {
+                if ($cheque->datahora && $cheque->datahora !== '0000-00-00 00:00:00') {
+                    $cheque->datahora = Carbon::parse($cheque->datahora)->format('d/m/Y H:i');
+                } else {
+                    $cheque->datahora = null; 
+                }
+                return $cheque;
+            });;
 
         return response()->json($cheques);
     }

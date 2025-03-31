@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ChqCategoria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class ChqCategoriaController extends Controller
 {
@@ -13,7 +15,17 @@ class ChqCategoriaController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(ChqCategoria::all());
+
+        $categorias = ChqCategoria::all()->map(function ($categoria) {
+            if ($categoria->datahora && $categoria->datahora !== '0000-00-00 00:00:00') {
+                $categoria->datahora = Carbon::parse($categoria->datahora)->format('d/m/Y H:i');
+            } else {
+                $categoria->datahora = null;
+            }
+            return $categoria;
+        });
+    
+        return response()->json($categorias);
     }
 
     /**
