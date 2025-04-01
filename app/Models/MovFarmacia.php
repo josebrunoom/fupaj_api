@@ -21,4 +21,9 @@ class MovFarmacia extends Model
     ];
 
     protected $dates = ['deleted_at'];
+
+    public function associado(){
+        return $this->belongsTo(User::class, 'associado', 'id');
+    }
+
 }

@@ -185,15 +185,19 @@ class AuthController extends Controller
         if ($user->role == 1) {
             $lancamentos = [
                 'farmacia' => MovFarmacia::where('associado', $user->id)
-                    ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo') 
-                    ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome')  
+                    ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo')
+                    ->join('users', 'mov_farmacia.associado', '=', 'users.id')
+                    ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome', 'users.NOME as associado_nome') 
                     ->get()->map(function($mov) {
                         $mov->lancamento = Carbon::parse($mov->lancamento)->format('d/m/Y H:i');
                         $mov->emissao = Carbon::parse($mov->emissao)->format('d/m/Y H:i');
                         $mov->datahora = Carbon::parse($mov->datahora)->format('d/m/Y H:i');
                         return $mov;
                     }),
-                'creche' => MovCreche::where('associado', $user->id)->get()->map(function($creche) {
+                'creche' => MovCreche::where('associado', $user->id)
+                ->join('users', 'mov_creches.associado', '=', 'users.id')
+                ->select('mov_creches.*', 'users.NOME as associado_nome') 
+                ->get()->map(function($creche) {
                     $creche->lancamento = Carbon::parse($creche->lancamento)->format('d/m/Y H:i');
                     $creche->pagamento = Carbon::parse($creche->pagamento)->format('d/m/Y H:i');
                     $creche->datahora = Carbon::parse($creche->datahora)->format('d/m/Y H:i');
@@ -204,21 +208,28 @@ class AuthController extends Controller
         } elseif ($user->role == 3) {
             $lancamentos = [
                 'farmacia' => MovFarmacia::where('associado', $user->id)
-                    ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo') 
-                    ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome')  
+                    ->join('farmacias', 'mov_farmacia.farmacia', '=', 'farmacias.codigo')
+                    ->join('users', 'mov_farmacia.associado', '=', 'users.id')
+                    ->select('mov_farmacia.*', 'farmacias.nome as farmacia_nome', 'users.NOME as associado_nome')  
                     ->get()->map(function($mov) {
                         $mov->lancamento = Carbon::parse($mov->lancamento)->format('d/m/Y H:i');
                         $mov->emissao = Carbon::parse($mov->emissao)->format('d/m/Y H:i');
                         $mov->datahora = Carbon::parse($mov->datahora)->format('d/m/Y H:i');
                         return $mov;
                     }),
-                'creche' => MovCreche::all()->map(function($creche) {
+                'creche' => MovCreche::where('associado', $user->id)
+                ->join('users', 'mov_creches.associado', '=', 'users.id')
+                ->select('mov_creches.*', 'users.NOME as associado_nome')
+                ->get()->map(function($creche) {
                     $creche->lancamento = Carbon::parse($creche->lancamento)->format('d/m/Y H:i');
                     $creche->pagamento = Carbon::parse($creche->pagamento)->format('d/m/Y H:i');
                     $creche->datahora = Carbon::parse($creche->datahora)->format('d/m/Y H:i');
                     return $creche;
                 }),
-                'creche_associado' => MovCrecheAssociado::all()->map(function($creche_associado) {
+                'creche_associado' => MovCrecheAssociado::where('associado', $user->id)
+                ->join('users', 'mov_creches_associados.associado', '=', 'users.id')
+                ->select('mov_creches_associados.*', 'users.NOME as associado_nome')
+                ->get()->map(function($creche_associado) {
                     $creche_associado->lancamento = Carbon::parse($creche_associado->lancamento)->format('d/m/Y H:i');
                     $creche_associado->pagamento = Carbon::parse($creche_associado->pagamento)->format('d/m/Y H:i');
                     $creche_associado->datahora = Carbon::parse($creche_associado->datahora)->format('d/m/Y H:i');

@@ -81,4 +81,9 @@ class User extends Authenticatable implements JWTSubject
     public function categorias(){
         return $this->belongsToMany(ChqCategoria::class, 'user_categoria', 'user_id', 'categoria_id');
     }
+
+    public function movFarmacias(){
+        return $this->hasMany(MovFarmacia::class, 'associado', 'id');
+    }
+
 }
