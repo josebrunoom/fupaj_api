@@ -393,6 +393,34 @@ class AuthController extends Controller
         ]);
     }    
 
+    public function recoverPassword(Request $request){
+        $request->validate([
+            'CPF' => 'required|digits:11',
+            'NOME_MAE' => 'required|string'
+        ]);
+
+        $cpf = preg_replace('/\D/', '', $request->CPF);
+
+        $user = User::where('CPF', $cpf)->where('NOME_MAE', $request->NOME_MAE)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Dados inválidos. Verifique as informações fornecidas.'], 404);
+        }
+
+        // Gerar nova senha baseada nos 5 primeiros dígitos do CPF
+        $novaSenha = substr($cpf, 0, 5);
+
+        // Atualizar a senha no banco (criptografada)
+        $user->PASSWORD = Hash::make($novaSenha);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Senha redefinida com sucesso.',
+            'nova_senha' => $novaSenha
+        ]);
+    }
+
+
     public function index() {
 
         if (!JWTAuth::user()) {

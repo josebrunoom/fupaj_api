@@ -18,6 +18,7 @@ use App\Http\Controllers\MovCrecheAssociadoController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/recuperar_senha', [AuthController::class, 'recoverPassword']);
 
 Route::middleware('auth.jwt')->group(function () {
     
