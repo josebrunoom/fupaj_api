@@ -14,6 +14,7 @@ use App\Http\Controllers\ChqCategoriaController;
 use App\Http\Controllers\ChqCategoriaAssociadoController;
 use App\Http\Controllers\MovCrecheController;
 use App\Http\Controllers\MovCrecheAssociadoController;
+use App\Http\Controllers\MedicoController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -47,6 +48,9 @@ Route::middleware('auth.jwt')->group(function () {
 
     //FARMACIAS
     Route::apiResource('farmacias', FarmaciaController::class);
+
+    //MEDICOS
+    Route::apiResource('medicos', MedicoController::class);
 
     //MOV FARMACIAS
     Route::get('mov_farmacia/trashed', [MovCrecheController::class, 'trashed']);
