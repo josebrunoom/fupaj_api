@@ -77,6 +77,10 @@ class MovCrecheAssociadoController extends Controller
         $registro->data_termino = ($registro->data_termino && $registro->data_termino !== '0000-00-00 00:00:00') 
             ? Carbon::parse($registro->data_termino)->format('d/m/Y H:i') 
             : null;
+
+            $registro->lancamento = ($registro->lancamento && $registro->lancamento !== '0000-00-00 00:00:00') 
+            ? Carbon::parse($registro->lancamento)->format('d/m/Y H:i') 
+            : null;
         
 
         return response()->json($registro);
