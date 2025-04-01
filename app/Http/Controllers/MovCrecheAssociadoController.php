@@ -65,12 +65,19 @@ class MovCrecheAssociadoController extends Controller
         if (!$registro) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
         }
-
-        if ($registro->datahora && $registro->datahora !== '0000-00-00 00:00:00') {
-            $registro->datahora = Carbon::parse($registro->datahora)->format('d/m/Y H:i');
-        } else {
-            $registro->datahora = null;
-        }
+        
+        $registro->datahora = ($registro->datahora && $registro->datahora !== '0000-00-00 00:00:00') 
+            ? Carbon::parse($registro->datahora)->format('d/m/Y H:i') 
+            : null;
+        
+        $registro->data_inicio = ($registro->data_inicio && $registro->data_inicio !== '0000-00-00 00:00:00') 
+            ? Carbon::parse($registro->data_inicio)->format('d/m/Y H:i') 
+            : null;
+        
+        $registro->data_termino = ($registro->data_termino && $registro->data_termino !== '0000-00-00 00:00:00') 
+            ? Carbon::parse($registro->data_termino)->format('d/m/Y H:i') 
+            : null;
+        
 
         return response()->json($registro);
     }
