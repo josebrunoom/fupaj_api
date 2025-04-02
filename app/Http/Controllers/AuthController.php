@@ -149,6 +149,7 @@ class AuthController extends Controller
         $users = User::whereIn('PARENTESCO', $dependents)->get()->map(function ($user) use ($formatDate) {
             $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
             $user->DATAHORA = $formatDate($user->DATAHORA);
+            $user->PARENTESCO_FORMATADO = preg_replace('/^\d+-/', '', $user->PARENTESCO);
             return $user;
         });
 
@@ -167,6 +168,7 @@ class AuthController extends Controller
         $users = User::whereIn('PARENTESCO', $aggregates)->get()->map(function ($user) use ($formatDate) {
             $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
             $user->DATAHORA = $formatDate($user->DATAHORA);
+            $user->PARENTESCO_FORMATADO = preg_replace('/^\d+-/', '', $user->PARENTESCO);
             return $user;
         });
 
