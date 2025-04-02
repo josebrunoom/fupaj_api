@@ -203,7 +203,15 @@ class AuthController extends Controller
                     $creche->datahora = Carbon::parse($creche->datahora)->format('d/m/Y H:i');
                     return $creche;
                 }),
-                'creche_associado' => MovCrecheAssociado::where('associado', $user->id)->get(),
+                'creche_associado' => MovCrecheAssociado::where('associado', $user->id)
+                    ->get()->map(function($creche_associado) {
+                    $creche_associado->lancamento = Carbon::parse($creche_associado->lancamento)->format('d/m/Y H:i');
+                    $creche_associado->pagamento = Carbon::parse($creche_associado->pagamento)->format('d/m/Y H:i');
+                    $creche_associado->datahora = Carbon::parse($creche_associado->datahora)->format('d/m/Y H:i');
+                    $creche_associado->data_inicio = Carbon::parse($creche_associado->data_inicio)->format('d/m/Y H:i');
+                    $creche_associado->data_termino = Carbon::parse($creche_associado->data_termino)->format('d/m/Y H:i');
+                    return $creche_associado;
+                }),
             ];
         } elseif ($user->role == 3) {
             $lancamentos = [
@@ -243,7 +251,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'nome' => $user->NOME,
                 'role' => $user->role
             ],
             'lancamentos' => $lancamentos
@@ -398,7 +406,7 @@ class AuthController extends Controller
             'token' => $token,
             'user' => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'nome' => $user->NOME,
                 'role' => $user->role
             ]
         ]);
