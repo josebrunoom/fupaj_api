@@ -385,33 +385,51 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
-        $request->validate([
-            'cpf' => 'required|digits:11',
-            'password' => 'required|string|min:5'
-        ]);
+        try {
+            Log::info('Login attempt', ['cpf' => $request->cpf]);
+            
+            $request->validate([
+                'cpf' => 'required|digits:11',
+                'password' => 'required|string|min:5'
+            ]);
 
-        $cpf = preg_replace('/\D/', '', $request->cpf);
+            $cpf = preg_replace('/\D/', '', $request->cpf);
+            Log::info('Searching for user with CPF', ['cpf' => $cpf]);
 
-        $user = User::where('cpf', $cpf)->first();
+            $user = User::where('cpf', $cpf)->first();
 
-        if (!$user) {
-            return response()->json(['error' => 'Usuário não encontrado'], 404);
+            if (!$user) {
+                Log::warning('User not found', ['cpf' => $cpf]);
+                return response()->json(['error' => 'Usuário não encontrado'], 404);
+            }
+
+            if (!Hash::check($request->password, $user->password)) {
+                Log::warning('Invalid password for user', ['cpf' => $cpf]);
+                return response()->json(['error' => 'CPF ou senha incorretos.'], 401);
+            }
+
+            $token = JWTAuth::fromUser($user);
+            Log::info('Login successful', ['user_id' => $user->id]);
+
+            return response()->json([
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'nome' => $user->NOME,
+                    'role' => $user->role
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Login error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'error' => 'Erro interno do servidor',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'CPF ou senha incorretos.'], 401);
-        }
-
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json([
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'nome' => $user->NOME,
-                'role' => $user->role
-            ]
-        ]);
     }    
 
     public function recoverPassword(Request $request){
