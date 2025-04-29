@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 
 class ClearRateLimit extends Command
 {
@@ -13,7 +12,7 @@ class ClearRateLimit extends Command
      *
      * @var string
      */
-    protected $signature = 'cache:clear-rate-limit';
+    protected $signature = 'rate-limit:clear';
 
     /**
      * The console command description.
@@ -29,16 +28,7 @@ class ClearRateLimit extends Command
      */
     public function handle()
     {
-        // Limpar cache de rate limiting
         $this->info('Clearing rate limiting cache...');
-        
-        // Limpar cache do Redis se estiver usando
-        try {
-            Redis::flushAll();
-            $this->info('Redis cache cleared.');
-        } catch (\Exception $e) {
-            $this->warn('Could not clear Redis cache: ' . $e->getMessage());
-        }
         
         // Limpar cache do Laravel
         Cache::flush();
