@@ -18,7 +18,7 @@ use App\Http\Controllers\MedicoController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle.login');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:100,1');
 Route::post('/recuperar_senha', [AuthController::class, 'recoverPassword']);
 
 Route::middleware('auth.jwt')->group(function () {

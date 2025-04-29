@@ -397,12 +397,6 @@ class AuthController extends Controller
             // Limpa o CPF de caracteres não numéricos
             $cpf = preg_replace('/\D/', '', $request->cpf);
             
-            // Validação do CPF após limpeza
-            /*if (strlen($cpf) !== 11) {
-                Log::warning('Invalid CPF length', ['cpf' => $cpf]);
-                return response()->json(['error' => 'CPF inválido. O CPF deve conter 11 dígitos.'], 422);
-            }*/
-
             Log::info('Searching for user with CPF', ['cpf' => $cpf]);
 
             $user = User::where('cpf', $cpf)->first();
