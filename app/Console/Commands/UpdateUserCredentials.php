@@ -23,9 +23,19 @@ class UpdateUserCredentials extends Command
     protected $description = 'Atualiza o campo email e senha dos usuários usando o CPF, ignorando duplicatas, priorizando usuários com SITUACAO ATIVO';
 
     /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
      * Execute the console command.
      *
-     * @return int
+     * @return mixed
      */
     public function handle()
     {
