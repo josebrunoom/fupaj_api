@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ChqCategoriaAssociado extends Model
 {
-    use HasFactory;
-
-    protected $table = 'chq_categorias_associado';
+    protected $table = 'chq_categorias_associados';
 
     protected $fillable = [
         'categoria',

@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MovChequeCreche extends Model
 {
-    use HasFactory;
-
     protected $table = 'mov_chequescreches';  // Define a tabela associada ao modelo
 
     protected $fillable = [

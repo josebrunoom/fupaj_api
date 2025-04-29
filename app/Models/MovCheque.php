@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MovCheque extends Model
 {
-    use HasFactory;
-
     protected $table = 'mov_cheques';
     protected $fillable = [
         'numcheque', 'valor', 'categoria', 'impresso', 'cancelado', 
