@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -13,7 +12,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use Notifiable;
 
     protected $fillable = [
         // Campos padrão
@@ -58,7 +57,6 @@ class User extends Authenticatable implements JWTSubject
         'NOME_MAE',
         'DATA_IDENTIDADE',
         'ORGAO_IDENTIDADE'
-
     ];
 
     protected $hidden = ['password'];
@@ -85,5 +83,4 @@ class User extends Authenticatable implements JWTSubject
     public function movFarmacias(){
         return $this->hasMany(MovFarmacia::class, 'associado', 'id');
     }
-
 }
