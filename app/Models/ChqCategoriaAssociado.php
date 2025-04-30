@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChqCategoriaAssociado extends Model
 {
-    protected $table = 'chq_categorias_associados';
+    protected $table = 'chq_categorias_associado';
 
     protected $fillable = [
         'categoria',
