@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MovFarmaciaController;
-use App\Http\Controllers\Api\FarmaciaController;
+use App\Http\Controllers\Api\FarmaciaController as ApiFarmaciaController;
 use App\Http\Controllers\MovFiltroSolarController;
 use App\Http\Controllers\MovChequeController;
 use App\Http\Controllers\MovChequeCrecheController;
@@ -47,7 +47,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::apiResource('empresas', EmpresaController::class);
 
     //FARMACIAS
-    Route::apiResource('farmacias', FarmaciaController::class);
+    Route::apiResource('farmacias', ApiFarmaciaController::class);
 
     //MEDICOS
     Route::apiResource('medicos', MedicoController::class);
