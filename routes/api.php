@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MovFarmaciaController;
-use App\Http\Controllers\FarmaciaController;
+use App\Http\Controllers\Api\FarmaciaController;
 use App\Http\Controllers\MovFiltroSolarController;
 use App\Http\Controllers\MovChequeController;
 use App\Http\Controllers\MovChequeCrecheController;

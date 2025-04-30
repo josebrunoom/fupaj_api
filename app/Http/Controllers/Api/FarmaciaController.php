@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Farmacia;
 use Carbon\Carbon;
@@ -68,5 +69,4 @@ class FarmaciaController extends Controller
         Farmacia::destroy($id);
         return response()->json(['message' => 'Farmácia excluída com sucesso']);
     }
-}
-
+} 
