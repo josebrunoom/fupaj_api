@@ -71,7 +71,7 @@ class MovFarmaciaController extends Controller
     }
 
     public function update(Request $request, $id){
-        $mov_farmacia = MovFarmacia::withTrashed()->find($id);
+        $mov_farmacia = MovFarmacia::find($id);
 
         if (!$mov_farmacia) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
@@ -117,7 +117,7 @@ class MovFarmaciaController extends Controller
     // Soft delete (marca como deletado e adiciona observação)
     public function destroy(Request $request, $id)
     {
-        $mov_farmacia = MovFarmacia::withTrashed()->find($id);
+        $mov_farmacia = MovFarmacia::find($id);
 
         if (!$mov_farmacia) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
@@ -141,7 +141,7 @@ class MovFarmaciaController extends Controller
     // Restaura um registro deletado
     public function restore($id)
     {
-        $mov_farmacia = MovFarmacia::onlyTrashed()->find($id);
+        $mov_farmacia = MovFarmacia::find($id);
 
         if (!$mov_farmacia) {
             return response()->json(['message' => 'Registro não encontrado ou já restaurado'], 404);
