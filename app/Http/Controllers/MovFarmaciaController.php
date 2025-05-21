@@ -56,8 +56,8 @@ class MovFarmaciaController extends Controller
     // Retorna um registro específico, incluindo deletados
     public function show($id)
     {
-        $mov_farmacia = MovFarmacia::withTrashed()
-            ->join('users', 'users.id', '=', 'mov_farmacia.associado')
+        $mov_farmacia = MovFarmacia::
+            join('users', 'users.id', '=', 'mov_farmacia.associado')
             ->join('farmacias', 'farmacias.codigo', '=', 'mov_farmacia.farmacia')
             ->select('mov_farmacia.*', 'users.NOME as nome_usuario', 'farmacias.nome as nome_farmacia')
             ->where('mov_farmacia.id', $id)
