@@ -86,15 +86,17 @@ class AuthController extends Controller
             $aggregates = ['90-AGREGADOS'];
     
             // Dependentes entre 21 e 24 anos nos próximos 3 meses
-            $dependentsQuery = User::whereIn('PARENTESCO', $dependents)
-                ->whereBetween('NASCIMENTO', [$twentyFourStart, $twentyFourEnd])
-                ->orWhereBetween('NASCIMENTO', [$twentyOneStart, $twentyOneEnd])
-                ->select('id', 'NOME', 'CPF', 'NASCIMENTO', 'PARENTESCO');
+            $dependentsQuery = User::whereIn('users.PARENTESCO', $dependents)
+                ->whereBetween('users.NASCIMENTO', [$twentyFourStart, $twentyFourEnd])
+                ->orWhereBetween('users.NASCIMENTO', [$twentyOneStart, $twentyOneEnd])
+                ->join('users as parent', 'parent.codigo', '=', 'users.codigo')
+                ->select('users.id', 'users.NOME', 'users.CPF', 'users.NASCIMENTO', 'users.PARENTESCO', 'parent.NOME as parent_name');
     
             // Agregados que completam 40 anos nos próximos 3 meses
-            $aggregatesQuery = User::whereIn('PARENTESCO', $aggregates)
-                ->whereBetween('NASCIMENTO', [$fortyStart, $fortyEnd])
-                ->select('id', 'NOME', 'CPF', 'NASCIMENTO', 'PARENTESCO');
+            $aggregatesQuery = User::whereIn('users.PARENTESCO', $aggregates)
+                ->whereBetween('users.NASCIMENTO', [$fortyStart, $fortyEnd])
+                ->join('users as parent', 'parent.codigo', '=', 'users.codigo')
+                ->select('users.id', 'users.NOME', 'users.CPF', 'users.NASCIMENTO', 'users.PARENTESCO', 'parent.NOME as parent_name');
     
             // Une as consultas
             $retorno['dependents'] = $dependentsQuery->union($aggregatesQuery)->get();
@@ -124,7 +126,9 @@ class AuthController extends Controller
                 : null;
         };
 
-        $users = User::where('PARENTESCO', '00-TITULAR')->get()->map(function ($user) use ($formatDate) {
+        $users = User::where('PARENTESCO', '00-TITULAR')
+        ->orderBy('NOME', 'asc')
+        ->get()->map(function ($user) use ($formatDate) {
             $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
             $user->DATAHORA = $formatDate($user->DATAHORA);
             return $user;
@@ -146,7 +150,9 @@ class AuthController extends Controller
                 : null;
         };
 
-        $users = User::whereIn('PARENTESCO', $dependents)->get()->map(function ($user) use ($formatDate) {
+        $users = User::whereIn('PARENTESCO', $dependents)
+        ->orderBy('NOME', 'asc')
+            ->get()->map(function ($user) use ($formatDate) {
             $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
             $user->DATAHORA = $formatDate($user->DATAHORA);
             $user->PARENTESCO_FORMATADO = preg_replace('/^\d+-/', '', $user->PARENTESCO);
@@ -154,6 +160,14 @@ class AuthController extends Controller
         });
 
         return response()->json(['dependentes' => $users]);
+    }
+
+    public function getDependentesById($id){
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'Usuário não encontrado'], 404);
+        }
+        return response()->json($user);
     }
 
     public function getAgregados() {
@@ -165,7 +179,9 @@ class AuthController extends Controller
                 : null;
         };
 
-        $users = User::whereIn('PARENTESCO', $aggregates)->get()->map(function ($user) use ($formatDate) {
+        $users = User::whereIn('PARENTESCO', $aggregates)
+        ->orderBy('NOME', 'asc')
+            ->get()->map(function ($user) use ($formatDate) {
             $user->NASCIMENTO = $formatDate($user->NASCIMENTO);
             $user->DATAHORA = $formatDate($user->DATAHORA);
             $user->PARENTESCO_FORMATADO = preg_replace('/^\d+-/', '', $user->PARENTESCO);
@@ -288,7 +304,7 @@ class AuthController extends Controller
             'user.FUNCAO' => 'nullable|string|max:255',
             'user.NOME_MAE' => 'nullable|string|max:255',
             'user.NOME_PAI' => 'nullable|string|max:255',
-            'categorias' => 'required|array',
+            'categorias' => 'array',
             'categorias.*' => 'exists:chq_categorias,id',
         ]);
 
@@ -298,15 +314,17 @@ class AuthController extends Controller
         // Gerar email e senha com base no CPF
         $cpf = $userData['CPF'];
         $email = $cpf;
-        $senha = substr($cpf, 0, 5);
+       
 
         DB::beginTransaction();
 
         // Criar o usuário
         $user = User::create([
+            'name' => $userData['NOME'],
+            'email' => $userData['CPF'],
+            'password' => Hash::make($userData['password']),
+            'role' => $userData['role'],
             'NOME' => $userData['NOME'],
-            'EMAIL' => $email,
-            'PASSWORD' => Hash::make($senha),
             'SITUACAO' => $userData['SITUACAO'],
             'SEXO' => $userData['SEXO'],
             'NASCIMENTO' => $userData['NASCIMENTO'],
@@ -327,7 +345,12 @@ class AuthController extends Controller
             'FUNCAO' => $userData['FUNCAO'],
             'NOME_MAE' => $userData['NOME_MAE'],
             'NOME_PAI' => $userData['NOME_PAI'],
+            'PARENTESCO' => $userData['PARENTESCO'],
         ]);
+
+        // Save the generated user ID to CODIGO column
+        $user->CODIGO = $user->id;
+        $user->save();
 
         $categorias = $request->input('categorias'); 
         foreach ($categorias as $categoriaId) {

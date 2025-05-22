@@ -22,7 +22,6 @@ class MedicoController extends Controller {
             'telefone' => 'required|string|max:20',
             'crm' => 'required|string|max:20|unique:medicos',
             'cpf' => 'required|string|max:14|unique:medicos',
-            'usuario' => 'required|string|max:100',
             'cnpj' => 'nullable|string|max:18',
         ]);
 

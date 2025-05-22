@@ -37,6 +37,7 @@ Route::middleware('auth.jwt')->group(function () {
     //ENDPOINTS PARA ASSOCIADOS, AGREGADOS E DEPENDENTES
     Route::get('/associados', [AuthController::class, 'getAssociados']);
     Route::get('/dependentes', [AuthController::class, 'getDependentes']);
+    Route::get('/dependentes/{id}', [AuthController::class, 'getDependentesById']);
     Route::get('/agregados', [AuthController::class, 'getAgregados']);
     Route::post('associados/criar', [AuthController::class, 'createUserWithCategories']);
 
