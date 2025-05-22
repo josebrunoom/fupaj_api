@@ -48,7 +48,6 @@ class MedicoController extends Controller {
             'telefone' => 'sometimes|string|max:20',
             'crm' => 'sometimes|string|max:20|unique:medicos,crm,' . $id,
             'cpf' => 'sometimes|string|max:14|unique:medicos,cpf,' . $id,
-            'usuario' => 'sometimes|string|max:100',
             'cnpj' => 'nullable|string|max:18',
         ]);
 
