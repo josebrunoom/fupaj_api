@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChqCategoria;
+use App\Models\ChqCategoriaAssociado;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -81,13 +82,13 @@ class ChqCategoriaController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        $categoriaAssociado = ChqCategoriaAssociado::find($id);
+        $categoria = ChqCategoria::find($id);
 
-        if (!$categoriaAssociado) {
+        if (!$categoria) {
             return response()->json(['message' => 'Registro não encontrado'], 404);
         }
 
-        $categoriaAssociado->delete();
+        $categoria->delete();
 
         return response()->json(['message' => 'Registro excluído com sucesso']);
     }
