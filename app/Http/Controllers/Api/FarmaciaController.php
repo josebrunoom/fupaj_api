@@ -11,7 +11,7 @@ class FarmaciaController extends Controller
 {
     public function index()
     {
-        $farmacias = Farmacia::all()->map(function ($farmacia) {
+        $farmacias = Farmacia::all()->orderBy('nome')->map(function ($farmacia) {
             if ($farmacia->data_hora && $farmacia->data_hora !== '0000-00-00 00:00:00') {
                 $farmacia->data_hora = Carbon::parse($farmacia->data_hora)->format('d/m/Y H:i');
             } else {
