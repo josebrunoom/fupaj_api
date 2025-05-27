@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\MovCheque;
 use App\Models\MovChequeCreche;
@@ -17,7 +18,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 
 class AuthController extends Controller
@@ -191,7 +191,7 @@ class AuthController extends Controller
         return response()->json(['agregados' => $users]);
     }
 
-    public function getLancamentos(Request $request){
+    public function getLancamentos(Request $request){ 
         $user = auth()->user();
     
         if (!$user) {
@@ -497,6 +497,56 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($id);
         return response()->json($user);
+    }
+
+    public function showCompleto($id)
+    {
+        $user = User::findOrFail($id);
+        $user->categorias = \DB::table('chq_categorias')
+            ->leftJoin('chq_categorias_associado', function($join) use ($user) {
+                $join->on('chq_categorias.id', '=', 'chq_categorias_associado.categoria')
+                    ->where('chq_categorias_associado.associado', $user->id);
+            })
+            ->select(
+                'chq_categorias.*',
+                \DB::raw('CASE WHEN chq_categorias_associado.id IS NOT NULL THEN 1 ELSE 0 END as selected')
+            )
+            ->get();
+        $user->dependentes = \DB::table('users')
+            ->where('codigo', $user->id)
+            ->where('parentesco', '!=', '00-TITULAR')
+            ->get();
+        return response()->json($user);
+    }
+
+    public function associadosCompletoAtivos()
+    {
+        $users = User::where(function($query) {
+            $query->where('SITUACAO', 'ATIVO')
+                  ->orWhere('SITUACAO', 'APOSENTADO');
+        })
+        ->where('PARENTESCO', '00-TITULAR')
+        ->get();
+
+        // foreach ($users as $user) {
+        //     $user->categorias = \DB::table('chq_categorias')
+        //         ->leftJoin('chq_categorias_associado', function($join) use ($user) {
+        //             $join->on('chq_categorias.id', '=', 'chq_categorias_associado.categoria')
+        //                 ->where('chq_categorias_associado.associado', $user->id);
+        //         })
+        //         ->select(
+        //             'chq_categorias.*',
+        //             \DB::raw('CASE WHEN chq_categorias_associado.id IS NOT NULL THEN 1 ELSE 0 END as selected')
+        //         )
+        //         ->get();
+
+        //     $user->dependentes = \DB::table('users')
+        //         ->where('codigo', $user->id)
+        //         ->where('parentesco', '!=', '00-TITULAR')
+        //         ->get();
+        // }
+
+        return response()->json($users);
     }
 
     public function profile() {

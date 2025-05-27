@@ -26,6 +26,7 @@ Route::middleware('auth.jwt')->group(function () {
     //USERS
     Route::get('/users', [AuthController::class, 'index']);
     Route::get('/users/{id}', [AuthController::class, 'show']);
+    Route::get('/users_completo/{id}', [AuthController::class, 'showCompleto']);
     Route::put('/users/{id}', [AuthController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -36,8 +37,11 @@ Route::middleware('auth.jwt')->group(function () {
 
     //ENDPOINTS PARA ASSOCIADOS, AGREGADOS E DEPENDENTES
     Route::get('/associados', [AuthController::class, 'getAssociados']);
+    Route::get('/associados_completo', [AuthController::class, 'associadosCompletoAtivos']);
+    
     Route::get('/dependentes', [AuthController::class, 'getDependentes']);
     Route::get('/dependentes/{id}', [AuthController::class, 'getDependentesById']);
+    
     Route::get('/agregados', [AuthController::class, 'getAgregados']);
     Route::post('associados/criar', [AuthController::class, 'createUserWithCategories']);
 
