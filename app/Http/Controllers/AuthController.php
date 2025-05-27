@@ -276,108 +276,108 @@ class AuthController extends Controller
     
 
     public function createUserWithCategories(Request $request)
-{
-    try {
-        // Validação dos dados de entrada
-        $request->validate([
-            'user.NOME' => 'required|string|max:255',
-            'user.CPF' => 'required|string|size:11|unique:users,CPF',
-            'user.SEXO' => 'required|string|max:10',
-            'user.SITUACAO' => 'required|string|max:20',
-            'user.NASCIMENTO' => 'required|date',
-            'user.CEP' => 'nullable|string|max:10',
-            'user.ENDERECO' => 'nullable|string|max:255',
-            'user.BAIRRO' => 'nullable|string|max:100',
-            'user.CIDADE' => 'nullable|string|max:100',
-            'user.ESTADO' => 'nullable|string|max:50',
-            'user.TELEFONE' => 'nullable|string|max:20',
-            'user.CELULAR' => 'nullable|string|max:20',
-            'user.EMPRESA' => 'nullable|string|max:255',
-            'user.BANCO' => 'nullable|string|max:255',
-            'user.AGENCIA' => 'nullable|string|max:50',
-            'user.CONTACORRENTE' => 'nullable|string|max:50',
-            'user.CARTPROFISSIONAL' => 'nullable|string|max:50',
-            'user.DOCTO_SUS' => 'nullable|string|max:50',
-            'user.ESTADOCIVIL' => 'nullable|string|max:50',
-            'user.FUNCAO' => 'nullable|string|max:255',
-            'user.NOME_MAE' => 'nullable|string|max:255',
-            'user.NOME_PAI' => 'nullable|string|max:255',
-            'categorias' => 'array',
-            'categorias.*' => 'exists:chq_categorias,id',
-        ]);
-
-        // Extraindo os dados do usuário do request
-        $userData = $request->input('user');
-
-        // Gerar email e senha com base no CPF
-        $cpf = $userData['CPF'];
-        $email = $cpf;
-       
-
-        DB::beginTransaction();
-
-        // Criar o usuário
-        $user = User::create([
-            'name' => $userData['NOME'],
-            'email' => $userData['CPF'],
-            'password' => Hash::make($userData['password']),
-            'role' => $userData['role'],
-            'NOME' => $userData['NOME'],
-            'SITUACAO' => $userData['SITUACAO'],
-            'SEXO' => $userData['SEXO'],
-            'NASCIMENTO' => $userData['NASCIMENTO'],
-            'CEP' => $userData['CEP'],
-            'ENDERECO' => $userData['ENDERECO'],
-            'BAIRRO' => $userData['BAIRRO'],
-            'CIDADE' => $userData['CIDADE'],
-            'ESTADO' => $userData['ESTADO'],
-            'TELEFONE' => $userData['TELEFONE'],
-            'CELULAR' => $userData['CELULAR'],
-            'EMPRESA' => $userData['EMPRESA'],
-            'BANCO' => $userData['BANCO'],
-            'AGENCIA' => $userData['AGENCIA'],
-            'CONTACORRENTE' => $userData['CONTACORRENTE'],
-            'CARTPROFISSIONAL' => $userData['CARTPROFISSIONAL'],
-            'DOCTO_SUS' => $userData['DOCTO_SUS'],
-            'ESTADOCIVIL' => $userData['ESTADOCIVIL'],
-            'FUNCAO' => $userData['FUNCAO'],
-            'NOME_MAE' => $userData['NOME_MAE'],
-            'NOME_PAI' => $userData['NOME_PAI'],
-            'PARENTESCO' => $userData['PARENTESCO'],
-        ]);
-
-        // Save the generated user ID to CODIGO column
-        $user->CODIGO = $user->id;
-        $user->save();
-
-        $categorias = $request->input('categorias'); 
-        foreach ($categorias as $categoriaId) {
-            DB::table('chq_categorias_associado')->insert([
-                'associado' => $user->id, 
-                'categoria' => $categoriaId,
+    {
+        try {
+            // Validação dos dados de entrada
+            $request->validate([
+                'user.NOME' => 'required|string|max:255',
+                'user.CPF' => 'required|string|size:11|unique:users,CPF',
+                'user.SEXO' => 'required|string|max:10',
+                'user.SITUACAO' => 'required|string|max:20',
+                'user.NASCIMENTO' => 'required|date',
+                'user.CEP' => 'nullable|string|max:10',
+                'user.ENDERECO' => 'nullable|string|max:255',
+                'user.BAIRRO' => 'nullable|string|max:100',
+                'user.CIDADE' => 'nullable|string|max:100',
+                'user.ESTADO' => 'nullable|string|max:50',
+                'user.TELEFONE' => 'nullable|string|max:20',
+                'user.CELULAR' => 'nullable|string|max:20',
+                'user.EMPRESA' => 'nullable|string|max:255',
+                'user.BANCO' => 'nullable|string|max:255',
+                'user.AGENCIA' => 'nullable|string|max:50',
+                'user.CONTACORRENTE' => 'nullable|string|max:50',
+                'user.CARTPROFISSIONAL' => 'nullable|string|max:50',
+                'user.DOCTO_SUS' => 'nullable|string|max:50',
+                'user.ESTADOCIVIL' => 'nullable|string|max:50',
+                'user.FUNCAO' => 'nullable|string|max:255',
+                'user.NOME_MAE' => 'nullable|string|max:255',
+                'user.NOME_PAI' => 'nullable|string|max:255',
+                'categorias' => 'array',
+                'categorias.*' => 'exists:chq_categorias,id',
             ]);
-        }
+
+            // Extraindo os dados do usuário do request
+            $userData = $request->input('user');
+
+            // Gerar email e senha com base no CPF
+            $cpf = $userData['CPF'];
+            $email = $cpf;
         
-        $token = JWTAuth::fromUser($user);
 
-        DB::commit();
+            DB::beginTransaction();
 
-        return response()->json([
-            'user' => $user,
-            'categorias' => $categorias,
-            'token' => $token
-        ], 201);
+            // Criar o usuário
+            $user = User::create([
+                'name' => $userData['NOME'],
+                'email' => $userData['CPF'],
+                'password' => Hash::make($userData['password']),
+                'role' => $userData['role'],
+                'NOME' => $userData['NOME'],
+                'SITUACAO' => $userData['SITUACAO'],
+                'SEXO' => $userData['SEXO'],
+                'NASCIMENTO' => $userData['NASCIMENTO'],
+                'CEP' => $userData['CEP'],
+                'ENDERECO' => $userData['ENDERECO'],
+                'BAIRRO' => $userData['BAIRRO'],
+                'CIDADE' => $userData['CIDADE'],
+                'ESTADO' => $userData['ESTADO'],
+                'TELEFONE' => $userData['TELEFONE'],
+                'CELULAR' => $userData['CELULAR'],
+                'EMPRESA' => $userData['EMPRESA'],
+                'BANCO' => $userData['BANCO'],
+                'AGENCIA' => $userData['AGENCIA'],
+                'CONTACORRENTE' => $userData['CONTACORRENTE'],
+                'CARTPROFISSIONAL' => $userData['CARTPROFISSIONAL'],
+                'DOCTO_SUS' => $userData['DOCTO_SUS'],
+                'ESTADOCIVIL' => $userData['ESTADOCIVIL'],
+                'FUNCAO' => $userData['FUNCAO'],
+                'NOME_MAE' => $userData['NOME_MAE'],
+                'NOME_PAI' => $userData['NOME_PAI'],
+                'PARENTESCO' => $userData['PARENTESCO'],
+            ]);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error($e);
+            // Save the generated user ID to CODIGO column
+            $user->CODIGO = $user->id;
+            $user->save();
 
-        return response()->json([
-            'errors' => $e instanceof \Illuminate\Validation\ValidationException ? $e->errors() : $e->getMessage(),
-            'error' => 'Não foi possível criar o usuário, tente novamente mais tarde',
-        ], 422);
+            $categorias = $request->input('categorias'); 
+            foreach ($categorias as $categoriaId) {
+                DB::table('chq_categorias_associado')->insert([
+                    'associado' => $user->id, 
+                    'categoria' => $categoriaId,
+                ]);
+            }
+            
+            $token = JWTAuth::fromUser($user);
+
+            DB::commit();
+
+            return response()->json([
+                'user' => $user,
+                'categorias' => $categorias,
+                'token' => $token
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e);
+
+            return response()->json([
+                'errors' => $e instanceof \Illuminate\Validation\ValidationException ? $e->errors() : $e->getMessage(),
+                'error' => 'Não foi possível criar o usuário, tente novamente mais tarde',
+            ], 422);
+        }
     }
-}
 
     
     
@@ -521,30 +521,13 @@ class AuthController extends Controller
 
     public function associadosCompletoAtivos()
     {
-        $users = User::where(function($query) {
-            $query->where('SITUACAO', 'ATIVO')
-                  ->orWhere('SITUACAO', 'APOSENTADO');
-        })
-        ->where('PARENTESCO', '00-TITULAR')
-        ->get();
-
-        // foreach ($users as $user) {
-        //     $user->categorias = \DB::table('chq_categorias')
-        //         ->leftJoin('chq_categorias_associado', function($join) use ($user) {
-        //             $join->on('chq_categorias.id', '=', 'chq_categorias_associado.categoria')
-        //                 ->where('chq_categorias_associado.associado', $user->id);
-        //         })
-        //         ->select(
-        //             'chq_categorias.*',
-        //             \DB::raw('CASE WHEN chq_categorias_associado.id IS NOT NULL THEN 1 ELSE 0 END as selected')
-        //         )
-        //         ->get();
-
-        //     $user->dependentes = \DB::table('users')
-        //         ->where('codigo', $user->id)
-        //         ->where('parentesco', '!=', '00-TITULAR')
-        //         ->get();
-        // }
+        $users = User::with(['categorias', 'dependentes'])
+            ->where(function($query) {
+                $query->where('SITUACAO', 'ATIVO')
+                      ->orWhere('SITUACAO', 'APOSENTADO');
+            })
+            ->where('PARENTESCO', '00-TITULAR')
+            ->get();
 
         return response()->json($users);
     }

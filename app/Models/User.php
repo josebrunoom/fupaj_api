@@ -14,6 +14,16 @@ class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
+
+
+    public function dependentes()
+    {
+        return $this->hasMany(User::class, 'codigo')
+            ->where('parentesco', '!=', '00-TITULAR');
+    }
+
+
+
     protected $fillable = [
         // Campos padrão
         'name',
@@ -56,7 +66,8 @@ class User extends Authenticatable implements JWTSubject
         'NOME_PAI',
         'NOME_MAE',
         'DATA_IDENTIDADE',
-        'ORGAO_IDENTIDADE'
+        'ORGAO_IDENTIDADE',
+        'PARENTESCO'
     ];
 
     protected $hidden = ['password'];
