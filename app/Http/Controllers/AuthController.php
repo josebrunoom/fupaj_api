@@ -344,10 +344,12 @@ class AuthController extends Controller
                 'NOME_MAE' => $userData['NOME_MAE'],
                 'NOME_PAI' => $userData['NOME_PAI'],
                 'PARENTESCO' => $userData['PARENTESCO'],
+                'CPF' => $userData['CPF'],
             ]);
 
             // Save the generated user ID to CODIGO column
             $user->CODIGO = $user->id;
+            $user->DATAHORA = Carbon::now();
             $user->save();
 
             $categorias = $request->input('categorias'); 
