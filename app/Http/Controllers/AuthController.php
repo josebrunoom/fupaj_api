@@ -347,8 +347,12 @@ class AuthController extends Controller
                 'CPF' => $userData['CPF'],
             ]);
 
-            // Save the generated user ID to CODIGO column
-            $user->CODIGO = $user->id;
+            // Save the generated user ID to CODIGO column if CODIGO is empty
+            if (empty($userData['CODIGO'])) {
+                $user->CODIGO = $user->id;
+            } else {
+                $user->CODIGO = $userData['CODIGO'];
+            }
             $user->DATAHORA = Carbon::now();
             $user->save();
 
